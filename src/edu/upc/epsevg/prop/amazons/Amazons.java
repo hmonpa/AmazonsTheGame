@@ -23,7 +23,7 @@ public class Amazons {
                 IPlayer player1 = new HumanPlayer("Snail");
                 IPlayer player2 = new CarlinhosPlayer();
                 
-                new AmazonsBoard(player1 , player2, 10, Level.HALF_BOARD);
+                new AmazonsBoard(player1 , player2, 10, Level.QUARTERBOARD);
                 
             }
         });
