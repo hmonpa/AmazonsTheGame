@@ -6,3 +6,5 @@ build/
 dist/
 nbdist/
 .nb-gradle/
+src/edu/upc/epsevg/prop/amazons/JControlsPanel*
+src/edu/upc/epsevg/prop/amazons/AmazonsBoard.java
