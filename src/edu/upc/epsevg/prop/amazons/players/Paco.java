@@ -1,9 +1,11 @@
 package edu.upc.epsevg.prop.amazons.players;
 
 import edu.upc.epsevg.prop.amazons.CellType;
+import static edu.upc.epsevg.prop.amazons.CellType.*;
 import edu.upc.epsevg.prop.amazons.GameStatus;
 import edu.upc.epsevg.prop.amazons.IAuto;
 import edu.upc.epsevg.prop.amazons.IPlayer;
+import edu.upc.epsevg.prop.amazons.Level;
 import edu.upc.epsevg.prop.amazons.Move;
 import edu.upc.epsevg.prop.amazons.SearchType;
 import java.awt.Point;
@@ -17,10 +19,12 @@ public class Paco implements IPlayer, IAuto {
 
     private String name;
     private GameStatus s;
-    private int cont;
-
-    public Paco() {
+    //private Level level;
+    private int depth;
+    
+    public Paco(int depth) {
         this.name = "Paco";
+        this.depth = depth;
     }
 
     //@Override
@@ -40,12 +44,17 @@ public class Paco implements IPlayer, IAuto {
         for (i=0; i<listAmazonas.size(); i++){
             ArrayList<Point> listMoviments = new ArrayList<>();
             listMoviments = s.getAmazonMoves(listAmazonas.get(i), true);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
-            
             for (int j=0; j<listMoviments.size(); j++){
+                GameStatus s2 = new GameStatus(s);
+                s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
                 System.out.println("Movimientos disponibles para Amazona: " + i + ": " + listMoviments.get(j));
+                System.out.println("Print: " + s2.toString());
+                double valMax = min(s2, --depth, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                //. ...
             }
         }
-
+        
+        
         
         Point queenTo = null;
         Point queenFrom = null;
@@ -59,26 +68,73 @@ public class Paco implements IPlayer, IAuto {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    /*private int max(GameStatus t, int depth, int player, int alpha, int beta){
-    // Max
+    private double min(GameStatus s, int depth, CellType color, double alpha, double beta){
+      // Min
+      if (depth == 0) return 0;     // aquí va la función heurística
+      
+        ArrayList<Point> listAmazonas = new ArrayList<>();
+        int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
+        for (int i=0; i<numAmazonas; i++){
+            listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
+        }
+        int i = 0;
+        while (i < listAmazonas.size()){
+            System.out.println("Amazona: " + i +": " + listAmazonas.get(i));
+            i++;
+        }
+        
+        double valMin = Double.POSITIVE_INFINITY;
+        
+        for (i=0; i<listAmazonas.size(); i++){
+            ArrayList<Point> listMoviments = new ArrayList<>();
+            listMoviments = s.getAmazonMoves(listAmazonas.get(i), true);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
+            for (int j=0; j<listMoviments.size(); j++){
+                GameStatus s2 = new GameStatus(s);
+                s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
+                valMin = Math.min(valMin, max(s2, --depth, opposite(color), alpha, beta));
+                    
+                beta = Math.min(beta, valMin);
+                if (beta <= alpha){
+                    return beta;
+                }
+            }
+        }     
+      return beta;
+    }
     
-        if (isGameOver || depth == 0) return heuristica(t, player);
-        for (int i=0;i<t.getSize();i++){    
-            if (t.movpossible(i)){
-                GameStatus t2 = new GameStatus(t);
-                cont++;
-                t2.afegeix(i, player);
-                if (t2.solucio(i, player)) return Integer.MAX_VALUE;
-                //estat2.pintaTaulerALaConsola();
-                int valor = min(t2, depth-1, -player, alpha, beta);    
-                alpha = Math.max(alpha, valor);
+    private double max(GameStatus s, int depth, CellType color, double alpha, double beta){
+        // Min
+        if (depth == 0) return 0;   // aquí va la función heurística
+      
+        ArrayList<Point> listAmazonas = new ArrayList<>();
+        int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
+        for (int i=0; i<numAmazonas; i++){
+            listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
+        }
+        int i = 0;
+        while (i < listAmazonas.size()){
+            System.out.println("Amazona: " + i +": " + listAmazonas.get(i));
+            i++;
+        }
+        
+        double valMax = Double.NEGATIVE_INFINITY;
+        
+        for (i=0; i<listAmazonas.size(); i++){
+            ArrayList<Point> listMoviments = new ArrayList<>();
+            listMoviments = s.getAmazonMoves(listAmazonas.get(i), true);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
+            for (int j=0; j<listMoviments.size(); j++){
+                GameStatus s2 = new GameStatus(s);
+                s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
+                valMax = Math.max(valMax, min(s2, --depth, opposite(color), alpha, beta));
+                    
+                alpha = Math.max(alpha, valMax);
                 if (beta <= alpha){
                     return alpha;
                 }
             }
-        }
+        }     
         return alpha;
-    }*/
+    }
     
     
     @Override
