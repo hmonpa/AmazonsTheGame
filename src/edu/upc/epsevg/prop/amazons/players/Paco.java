@@ -32,11 +32,13 @@ public class Paco implements IPlayer, IAuto {
         CellType color = s.getCurrentPlayer();                      // Devuelve jugador actual (P1 o P2)
         ArrayList<Point> listAmazonas = new ArrayList<>();
         int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
-        for (int i=0; i<numAmazonas; i++){
+        for (int i=0; i<numAmazonas ; i++){
+            System.out.println(i);
             listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
         }
         int i = 0;
         while (i < listAmazonas.size()){
+            
             System.out.println("Amazona: " + i +": " + listAmazonas.get(i));
             i++;
         }
@@ -46,10 +48,12 @@ public class Paco implements IPlayer, IAuto {
             listMoviments = s.getAmazonMoves(listAmazonas.get(i), true);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
             for (int j=0; j<listMoviments.size(); j++){
                 GameStatus s2 = new GameStatus(s);
+                System.out.println("de : " + s2.getAmazon(color, i) + "hacia "+ listMoviments.get(j)) ;
                 s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
                 System.out.println("Movimientos disponibles para Amazona: " + i + ": " + listMoviments.get(j));
                 System.out.println("Print: " + s2.toString());
-                double valMax = min(s2, --depth, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                color = CellType.opposite(color);
+                double valMax = min_max(s2, --depth, color, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,false);
                 //. ...
             }
         }
@@ -68,10 +72,14 @@ public class Paco implements IPlayer, IAuto {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    private double min(GameStatus s, int depth, CellType color, double alpha, double beta){
+    private double min_max(GameStatus s, int depth, CellType color, double alpha, double beta, boolean min_or_max){
       // Min
-      if (depth == 0) return 0;     // aquí va la función heurística
-      
+        System.out.println("Print: " + s.toString());
+        double val_actual;
+        double eval;
+        
+        if (depth == 0) return 0;     // aquí va la función heurística
+
         ArrayList<Point> listAmazonas = new ArrayList<>();
         int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
         for (int i=0; i<numAmazonas; i++){
@@ -83,25 +91,38 @@ public class Paco implements IPlayer, IAuto {
             i++;
         }
         
-        double valMin = Double.POSITIVE_INFINITY;
+        
+        if(min_or_max) val_actual = Double.NEGATIVE_INFINITY;
+        else val_actual = Double.POSITIVE_INFINITY;
         
         for (i=0; i<listAmazonas.size(); i++){
             ArrayList<Point> listMoviments = new ArrayList<>();
             listMoviments = s.getAmazonMoves(listAmazonas.get(i), true);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
             for (int j=0; j<listMoviments.size(); j++){
                 GameStatus s2 = new GameStatus(s);
+                System.out.println("de : " + s2.getAmazon(color, i) + "hacia "+ listMoviments.get(j)) ;
                 s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
-                valMin = Math.min(valMin, max(s2, --depth, opposite(color), alpha, beta));
-                    
-                beta = Math.min(beta, valMin);
-                if (beta <= alpha){
-                    return beta;
+                /*eval = min_max(s2, --depth, opposite(color), alpha, beta, !min_or_max );
+                if(min_or_max){
+                    val_actual = Math.max(eval, val_actual);
+                    alpha = Math.max(alpha, eval);
+                    if(beta <= alpha) return val_actual;
+                    System.out.println("max ");
                 }
+                else{
+                    val_actual = Math.min(val_actual, eval);
+                    beta = Math.min(eval, beta);
+                    if (beta <= alpha) return val_actual;
+                    System.out.println("min ");
+                }*/
+                
             }
-        }     
-      return beta;
+        } 
+      
+        return val_actual;
     }
     
+    /*
     private double max(GameStatus s, int depth, CellType color, double alpha, double beta){
         // Min
         if (depth == 0) return 0;   // aquí va la función heurística
@@ -134,7 +155,7 @@ public class Paco implements IPlayer, IAuto {
             }
         }     
         return alpha;
-    }
+    }*/
     
     
     @Override
