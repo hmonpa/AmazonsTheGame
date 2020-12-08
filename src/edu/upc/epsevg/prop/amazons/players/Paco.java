@@ -19,6 +19,7 @@ public class Paco implements IPlayer, IAuto {
 
     private String name;
     private GameStatus s;
+    private double millor_moviment;
     //private Level level;
     private int depth;
     
@@ -50,15 +51,24 @@ public class Paco implements IPlayer, IAuto {
                 s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
                 System.out.println("Color: " + color);
                 
-                System.out.println("Flecha a: " + listMoviments.get(j+1));
-                s2.placeArrow(listMoviments.get(j+1));
+                //System.out.println("Flecha a: " + listMoviments.get(j+1));
+                boolean trobat=false;
+                for(int y=5;y<10 && !trobat;y++){
+                    for(int z=5; z<10 && !trobat;z++){
+                        Point t = new Point(y,z);
+                        if(s2.getPos(t) == EMPTY){
+                            s2.placeArrow(t);
+                            System.out.println("Flecha a: " + t);
+                            trobat = true;
+                        }
+                    }
+                }
                 
                 System.out.println("Primer print: ");
                 System.out.println(s2.toString());
                         
-                
                 // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
-                double valMax = min_max(s2, --depth, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, false);
+                millor_moviment = min_max(s2, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, false);
                 //. ...
             }
         }
@@ -78,7 +88,7 @@ public class Paco implements IPlayer, IAuto {
     }
     
     private double min_max(GameStatus s, int depth, CellType color, double alpha, double beta, boolean min_or_max){
-        
+        System.out.println("Profundidad = " + depth);
         //color = CellType.opposite(color);
         double val_actual;
         
@@ -95,25 +105,32 @@ public class Paco implements IPlayer, IAuto {
             i++;
         }
         
-        
-        if(min_or_max) val_actual = Double.NEGATIVE_INFINITY;
-        else val_actual = Double.POSITIVE_INFINITY;
+        if(min_or_max) val_actual = Double.NEGATIVE_INFINITY; // true = max
+        else val_actual = Double.POSITIVE_INFINITY; // false = min
         
         for (i=0; i<listAmazonas.size(); i++){
-            ArrayList<Point> listMoviments = new ArrayList<>();
-            listMoviments = s.getAmazonMoves(listAmazonas.get(i), true);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
+            ArrayList<Point> listMoviments = s.getAmazonMoves(listAmazonas.get(i), true); // Boolean=True: Muestra sólo jugadas finales, no intermedias
             for (int j=0; j<listMoviments.size(); j++){
                 GameStatus s2 = new GameStatus(s);
                 System.out.println("Movimiento de: " + s2.getAmazon(color, i) + "hacia " + listMoviments.get(j));                                
                 s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
-
-                if (j+1 < listMoviments.size()) s2.placeArrow(listMoviments.get(j+1));
-                else s2.placeArrow(listMoviments.get(j-2));
-                System.out.println("Flecha a: " + listMoviments.get(j+1));
+                
+                boolean trobat=false;
+                for(int y=5;y<10 && !trobat;y++){
+                    for(int z=5; z<10 && !trobat;z++){
+                        Point t = new Point(y,z);
+                        if(s2.getPos(t) == EMPTY){
+                            s2.placeArrow(t);
+                            trobat = true;
+                        }
+                    }
+                }
+                
                 System.out.println("Color: " + color);
                 System.out.println("Print: " + s2.toString());
-
-                double eval = min_max(s2, --depth, opposite(color), alpha, beta, !min_or_max);
+                System.out.println("booleano" + min_or_max);
+                double eval = min_max(s2, depth-1, opposite(color), alpha, beta, !min_or_max);
+                
                 if(min_or_max){
                     val_actual = Math.max(eval, val_actual);
                     alpha = Math.max(alpha, eval);
