@@ -41,6 +41,38 @@ public class Paco implements IPlayer, IAuto {
             System.out.println("Amazona " + i +": " + listAmazonas.get(i));
             i++;
         }
+        ArrayList<Point> listEnemics = new ArrayList<>();
+        
+        boolean trobades = false;                           // Es el enemic
+        int cont = 0;                                       // Contador que busca los enemigos
+        for (i=0; i<s.getSize() && !trobades; i++){         // Filas
+            for (int j=0; j<s.getSize() && !trobades; j++){ // Columnas
+                Point t = new Point(i,j);                   // t = posición i,j
+                //t.x;
+                //t.y;
+                if (s.getPos(t) == opposite(color)) {    
+                    listEnemics.add(t);
+                    cont++;
+                    if (cont == 4) trobades = true;
+                }
+            }
+        }
+        
+        i = 0;
+        while (i < listEnemics.size()){
+            int x = listEnemics.get(i).x;       // COLUMNA
+            int y = listEnemics.get(i).y;       // FILA
+            
+            //System.out.println("Amazona enemiga " + i +": " + listEnemics.get(i));
+            
+            for (int k=y-1; k<y+1; k++){
+                for (int l=x-1; l<x+1; l++){
+                    x=x+1;
+                }
+                y=y+1;
+            }
+            i++;
+        }
         
         for (i=0; i<listAmazonas.size(); i++){
             ArrayList<Point> listMoviments = new ArrayList<>();
@@ -89,7 +121,6 @@ public class Paco implements IPlayer, IAuto {
     
     private double min_max(GameStatus s, int depth, CellType color, double alpha, double beta, boolean min_or_max){
         System.out.println("Profundidad = " + depth);
-        //color = CellType.opposite(color);
         double val_actual;
         
         if (depth == 0) return 0;     // aquí va la función heurística
@@ -97,6 +128,7 @@ public class Paco implements IPlayer, IAuto {
         ArrayList<Point> listAmazonas = new ArrayList<>();
         int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
         for (int i=0; i<numAmazonas; i++){
+            System.out.println("Jugador:" + i);
             listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
         }
         int i = 0;
@@ -107,6 +139,9 @@ public class Paco implements IPlayer, IAuto {
         
         if(min_or_max) val_actual = Double.NEGATIVE_INFINITY; // true = max
         else val_actual = Double.POSITIVE_INFINITY; // false = min
+        
+        //ArrayList<Point> listEnemics = s.getNumberOfAmazonsForEachColor();
+        
         
         for (i=0; i<listAmazonas.size(); i++){
             ArrayList<Point> listMoviments = s.getAmazonMoves(listAmazonas.get(i), true); // Boolean=True: Muestra sólo jugadas finales, no intermedias
@@ -119,7 +154,8 @@ public class Paco implements IPlayer, IAuto {
                 for(int y=5;y<10 && !trobat;y++){
                     for(int z=5; z<10 && !trobat;z++){
                         Point t = new Point(y,z);
-                        if(s2.getPos(t) == EMPTY){
+                        if(s2.getPos(t) == EMPTY)
+                        {
                             s2.placeArrow(t);
                             trobat = true;
                         }

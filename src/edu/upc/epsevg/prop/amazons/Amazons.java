@@ -19,11 +19,11 @@ public class Amazons {
         
         SwingUtilities.invokeLater(new Runnable() {
             @Override
-            public void run() {
+            public void run(){
                 
                 //IPlayer player1 = new RandomPlayer("Falso paco");
-                //IPlayer player1 = new HumanPlayer("Snail");
-                IPlayer player1 = new Paco(12);
+                //IPlayer player1 = new HumanPlayer("Falso paco");
+                IPlayer player1 = new Paco(3);
                 IPlayer player2 = new CarlinhosPlayer();
                 
                 new AmazonsBoard(player1 , player2, 10, Level.QUARTERBOARD);
