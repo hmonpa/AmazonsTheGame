@@ -22,6 +22,7 @@ public class Paco implements IPlayer, IAuto {
     private double millor_moviment;
     //private Level level;
     private int depth;
+    int nodesExp;
     
     public Paco(int depth) {
         this.name = "Paco";
@@ -31,11 +32,15 @@ public class Paco implements IPlayer, IAuto {
     //@Override
     public Move move(GameStatus s){
         millor_moviment = Double.NEGATIVE_INFINITY;
-        Point arrowTo;
-        Point amazonTo;
-        Point amazonFrom;
+        Point arrowTo = null;
+        Point amazonTo = null;
+        Point amazonFrom = null;
+        nodesExp = 0;
         
-        CellType color = s.getCurrentPlayer();                      // Devuelve jugador actual (P1 o P2)
+        if (!s.isGameOver()){
+            CellType color = s.getCurrentPlayer();                      // Devuelve jugador actual (P1 o P2)
+        System.out.println("-------------------------------------" + color);
+        
         ArrayList<Point> listAmazonas = new ArrayList<>();
         int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
         int i = 0;
@@ -45,7 +50,6 @@ public class Paco implements IPlayer, IAuto {
         i = 0;
         
         // Imprime lista de amazonas propias y sus posiciones
-       
         while (i < listAmazonas.size()){
             System.out.println("Amazona " + i +": " + listAmazonas.get(i));
             i++;
@@ -66,36 +70,35 @@ public class Paco implements IPlayer, IAuto {
             }
         }
         
-        
         for (i=0; i<listAmazonas.size(); i++){
-            ArrayList<Point> listMoviments = new ArrayList<>();
-            listMoviments = s.getAmazonMoves(listAmazonas.get(i), true);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
+            ArrayList<Point> listMoviments = s.getAmazonMoves(listAmazonas.get(i), false);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
             for (int j=0; j<listMoviments.size(); j++){
                 GameStatus s2 = new GameStatus(s);
                 Point arrowToActual = null;
                 //System.out.println("Movimiento de : " + s2.getAmazon(color, i) + " hacia " + listMoviments.get(j)) ;
                 s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
-                System.out.println("Jugador: " + color);
-               
+                //System.out.println("Jugador: " + color);
+                nodesExp++;
                 int ii = 0;
-                
+                boolean trobat = false;
                 // Bucle tiraflechas
-                while (ii < listEnemics.size()){
+                while (ii < listEnemics.size() && !trobat){
                     int x = listEnemics.get(ii).x;       // COLUMNA
                     int y = listEnemics.get(ii).y;       // FILA
 
                     //System.out.println("Enemigo posición: X: "+ x + ",  Y: " + y);
-
+                    System.out.println("Enemigo " + ii);   
                     int varX = x-1, varY = y-1;
                     int conta = 0;
-                    boolean trobat = false;
+                    
                     while (varX <= x+1 && varY <= y+2 && !trobat){
                         //System.out.println("VarX es: " + varX + " y VarY es: " +varY + "cont es " + conta);
                         if ((varX >= 0 && varX <= 9) && (varY >=0 && varY <= 9)){
                             arrowToActual = new Point(varX,varY);
                             if (s2.getPos(arrowToActual) == EMPTY){
-                                //System.out.println("Tiro flecha a " + t);
+                                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + arrowToActual);
                                 s2.placeArrow(arrowToActual);
+                                //System.out.println(s2.isGameOver());
                                 trobat = true;
                             }
                         }
@@ -106,13 +109,13 @@ public class Paco implements IPlayer, IAuto {
                             varX++;
                             conta = 0;
                         }
-
                     }
+                    if (!trobat) arrowToActual = new Point(5,5);
                     ii++;
                 }
                 
-                System.out.println("Primer print: ");
-                System.out.println(s2.toString());
+                //System.out.println("Primer print: ");
+                //System.out.println(s2.toString());
                         
                 // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
                 double moviment = min_max(s2, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, listAmazonas, false);
@@ -122,30 +125,21 @@ public class Paco implements IPlayer, IAuto {
                     arrowTo = arrowToActual;
                     millor_moviment = moviment;
                 }
-//. ...
             }
         }
-        
-        
-        
-        Point queenTo = null;
-        Point queenFrom = null;
-
-        // "s" és una còpia del tauler, per es pot manipular sense perill
-        s.moveAmazon(queenFrom, queenTo);
-
-        //Point arrowTo = listAmazonas.get(0);
-
-        return new Move(listAmazonas.get(0), queenTo, arrowTo, 0, 0, SearchType.RANDOM);
+        }
+        System.out.println("is game over" + s.isGameOver());
+        System.out.println("arrow " + arrowTo);
+        return new Move(amazonFrom, amazonTo, arrowTo, nodesExp, depth, SearchType.MINIMAX);
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     private double min_max(GameStatus s, int depth, CellType color, double alpha, double beta, ArrayList<Point> listEnemics, boolean min_or_max){
         System.out.println("Profundidad = " + depth);
         double val_actual;
-        
+        nodesExp++;
         if (depth == 0 || s.isGameOver()){
-            //todo
+            System.out.println("Prof " + depth + " o Gameover " + s.isGameOver());
             double ret =  funcio_heuristica(s, color, listEnemics);
             System.out.println("Heuristica: "+ret);
             return ret;
@@ -173,11 +167,10 @@ public class Paco implements IPlayer, IAuto {
                 System.out.println("Movimiento de: " + s2.getAmazon(color, i) + " hacia " + listMoviments.get(j));                                
                 s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
                 listAmazonas.set(i, listMoviments.get(j));
-                
                 int ii = 0;
-                
+                boolean trobat = false;
                 // Bucle tiraflechas
-                while (ii < listEnemics.size()){
+                while (ii < listEnemics.size() && !trobat){
                     int x = listEnemics.get(ii).x;       // COLUMNA
                     int y = listEnemics.get(ii).y;       // FILA
 
@@ -186,14 +179,14 @@ public class Paco implements IPlayer, IAuto {
 
                     int varX = x-1, varY = y-1;
                     int conta = 0;
-                    boolean trobat = false;
+                    
                     while (varX <= x+1 && varY <= y+2 && !trobat){
                         //System.out.println("VarX es: " + varX + " y VarY es: " +varY + "cont es " + conta);
                         if ((varX >= 0 && varX <= 9) && (varY >=0 && varY <= 9)){
-                            Point t = new Point(varX,varY);
-                            if (s2.getPos(t) == EMPTY){
-                                //System.out.println("Tiro flecha a " + t);
-                                s2.placeArrow(t);
+                            Point arrowToActual = new Point(varX,varY);
+                            if (s2.getPos(arrowToActual) == EMPTY){
+                                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + arrowToActual);
+                                s2.placeArrow(arrowToActual);
                                 trobat = true;
                             }
                         }
@@ -204,13 +197,12 @@ public class Paco implements IPlayer, IAuto {
                             varX++;
                             conta = 0;
                         }
-
                     }
                     ii++;
                 }
                 
                 System.out.println("Jugador: " + color);
-                System.out.println("Print: " + s2.toString());
+                //System.out.println("Print: " + s2.toString());
                 //System.out.println("booleano" + min_or_max);
                 double eval = min_max(s2, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
                 
@@ -248,6 +240,7 @@ public class Paco implements IPlayer, IAuto {
      * @param s tauler
      * @param color jugador
      * @param listEnemics lista de amazonas del jugador enemic
+     * @return 
      */
     public double funcio_heuristica(GameStatus s,CellType color, ArrayList<Point> listEnemics){
         
@@ -255,7 +248,6 @@ public class Paco implements IPlayer, IAuto {
         ArrayList<Point> listAmazonas = new ArrayList<>();
         for (int i=0; i<numAmazonas; i++){
             listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
-            System.out.println("AmazonList" + i + ": " + listAmazonas.get(i));
         }
         
         int cont = 0;
@@ -287,20 +279,20 @@ public class Paco implements IPlayer, IAuto {
         }
         
         int cont2 = 0;
-        for(int i=0; i<listEnemics.size();i++){
+        boolean trobat = false;
+        for(int i=0; i<listEnemics.size() && !trobat;i++){
             int x = listEnemics.get(i).x;       // COLUMNA
             int y = listEnemics.get(i).y;       // FILA
-            System.out.println("Enemigo posición: X: "+ x + ",  Y: " + y);
+            //System.out.println("Enemigo posición: X: "+ x + ",  Y: " + y);
             
             int varX = x-1, varY = y-1;
             int conta = 0;
-            boolean trobat = false;
+            
             while (varX <= x+1 && varY <= y+2 && !trobat){
                 //System.out.println("VarX es: " + varX + " y VarY es: " +varY + "cont es " + conta);
                 if ((varX >= 0 && varX <= 9) && (varY >=0 && varY <= 9)){
                     Point t = new Point(varX,varY);
                     if (s.getPos(t) == EMPTY){
-                        System.out.println("Posicion: "+t);
                         cont2++;
                     }
                 }
