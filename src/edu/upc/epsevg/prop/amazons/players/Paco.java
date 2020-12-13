@@ -86,8 +86,9 @@ public class Paco implements IPlayer, IAuto {
                     int x = listEnemics.get(ii).x;       // COLUMNA
                     int y = listEnemics.get(ii).y;       // FILA
 
+                    arrowToActual = buscarMejorTiro(x, y, s2);
                     //System.out.println("Enemigo posición: X: "+ x + ",  Y: " + y);
-                    System.out.println("Enemigo " + ii);   
+                    /*System.out.println("Enemigo " + ii);   
                     int varX = x-1, varY = y-1;
                     int conta = 0;
                     
@@ -110,7 +111,9 @@ public class Paco implements IPlayer, IAuto {
                             conta = 0;
                         }
                     }
-                    if (!trobat) arrowToActual = new Point(5,5);
+                    */
+                    if (arrowToActual == null ) arrowToActual = new Point(5,5);
+                    else trobat = true;
                     ii++;
                 }
                 
@@ -174,14 +177,15 @@ public class Paco implements IPlayer, IAuto {
                     int x = listEnemics.get(ii).x;       // COLUMNA
                     int y = listEnemics.get(ii).y;       // FILA
 
+                    buscarMejorTiro(x, y, s2);
                     //System.out.println("Enemigo posición: X: "+ x + ",  Y: " + y);
                     //System.out.println("Amazona enemiga " + i +": " + listEnemics.get(i));
-
+                    /*
                     int varX = x-1, varY = y-1;
                     int conta = 0;
                     
-                    while (varX <= x+1 && varY <= y+2 && !trobat){
-                        //System.out.println("VarX es: " + varX + " y VarY es: " +varY + "cont es " + conta);
+                    while (varX <= x+1 && varY <= y+1 && !trobat){
+                        System.out.println("VarX es: " + varX + " y VarY es: " +varY + "cont es " + conta);
                         if ((varX >= 0 && varX <= 9) && (varY >=0 && varY <= 9)){
                             Point arrowToActual = new Point(varX,varY);
                             if (s2.getPos(arrowToActual) == EMPTY){
@@ -197,7 +201,9 @@ public class Paco implements IPlayer, IAuto {
                             varX++;
                             conta = 0;
                         }
-                    }
+                    }*/
+                    
+                    
                     ii++;
                 }
                 
@@ -307,6 +313,43 @@ public class Paco implements IPlayer, IAuto {
         }
         System.out.println("cont: "+cont + "  cont2: "+cont2);
         return cont2-cont;
+    }
+    
+    /**
+     * buscarMejorTiro Dada una posicion x e y de una amazona busca.
+     * @param x
+     * @param y
+     * @param s2
+     * @return
+     */
+    public Point buscarMejorTiro(int x, int y, GameStatus s2){
+        
+        int varX = x-1, varY = y-1;
+        int conta = 0;
+        boolean trobat = false;
+        Point arrowToActual = null;
+        while (varX <= x+1 && varY <= y+2 && !trobat){
+            System.out.println("VarX es: " + varX + " y VarY es: " +varY + "cont es " + conta);
+            if ((varX >= 0 && varX <= 9) && (varY >=0 && varY <= 9)){
+                arrowToActual = new Point(varX,varY);
+                if (s2.getPos(arrowToActual) == EMPTY){
+                    //System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + arrowToActual);
+                    s2.placeArrow(arrowToActual);
+                    trobat = true;
+                }
+            }
+            varY++;
+            conta++;
+            if (conta == 3){
+                varY = y-1;
+                varX++;
+                conta = 0;
+            }
+        }
+        
+        if(trobat == false) arrowToActual = null;
+        
+        return arrowToActual;
     }
 
 }
