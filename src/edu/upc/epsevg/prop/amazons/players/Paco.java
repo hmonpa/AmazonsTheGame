@@ -10,6 +10,7 @@ import edu.upc.epsevg.prop.amazons.Move;
 import edu.upc.epsevg.prop.amazons.SearchType;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  *
@@ -89,10 +90,11 @@ public class Paco implements IPlayer, IAuto {
                     arrowToActual = buscarMejorTiro(x, y, s2);
                     //if (arrowToActual == null) arrowToActual = new Point(5,5);
                     if (arrowToActual == null) arrowToActual = primer_lliure(s2);           // Si un jugador se suicida y no tiene ningun hueco a su alrededor
-                    else trobat = true;                                                     // el otro gana la partida colocando una flecha en el primer hueco libre
+                    else trobat = true;                                            // el otro gana la partida colocando una flecha en el primer hueco libre
                     ii++;
                 }
                 
+                s2.placeArrow(arrowToActual);
                 //System.out.println("Primer print: ");
                 //System.out.println(s2.toString());
                         
@@ -146,7 +148,7 @@ public class Paco implements IPlayer, IAuto {
                 
                 s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
 
-                listAmazonas.set(i, listMoviments.get(j));
+                listAmazonas.set(i, listMoviments.get(j)); // actualizamos las posiciones de las amazonas
                 int ii = 0;
                 boolean trobat = false;
                 // Bucle tiraflechas
@@ -292,109 +294,120 @@ public class Paco implements IPlayer, IAuto {
         
         int varX = x-1, varY = y-1;
         int conta = 0;
-        boolean trobat = false;
+        //boolean trobat = false;
         Point arrowToActual = null;
-        while (varX <= x+1 && varY <= y+2 && !trobat){
+        Point bestArrow = null;
+        int contadorMax = 0;
+        
+        
+        
+        while (varX <= x+1 && varY <= y+2){
+            
             //System.out.println("VarX es: " + varX + " y VarY es: " +varY + "cont es " + conta);
             if ((varX >= 0 && varX <= 9) && (varY >=0 && varY <= 9)){
                 arrowToActual = new Point(varX,varY);
+                
+                //System.out.println("entramos en mejor tiro");
                 if (s2.getPos(arrowToActual) == EMPTY){
+                    int i = 1;
+                    System.out.println("entramos en el bucle:x "+varX + " y:"+varY);
                     //System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + arrowToActual);
-                    /*int i;
-                    Point arrowTo0 = null;
-                    Point arrowTo1 = null;
-                    Point arrowTo2 = null;
-                    Point arrowTo3 = null;
-                    Point arrowTo4 = null;
-                    Point arrowTo5 = null;
-                    Point arrowTo6 = null;
-                    Point arrowTo7 = null;
-                     
-                    Integer vec[] = new Integer[8];
+                    //int i;
+                    //Integer vec[] = new Integer[8];
                     
                     // Revisión de las 8 posibles posiciones alrededor del contrincante
                     if (arrowToActual.x == x-1 && arrowToActual.y == y-1){          // Diagonal superior izq
-                        i = 1;
-                        arrowTo0 = arrowToActual;
-                        arrowToActual.x = varX-i;
-                        arrowToActual.y = varY-i;
+                        //i = 1;
+                       // arrowTo0 = arrowToActual;
+                        arrowToActual.x = varX-1;
+                        arrowToActual.y = varY-1;
                         
                         while (s2.getPos(arrowToActual) == EMPTY){
                             arrowToActual.x = varX-i;
                             arrowToActual.y = varY-i;
                             i++;
                         }
-                        vec[0] = i;
+                        //vec[0] = i;
+                        //vec.add(i);
                     }         
                     else if (arrowToActual.x == x-1 && arrowToActual.y == y){       // Vertical superior
-                        i = 1;
-                        arrowTo1 = arrowToActual;
-                        arrowToActual.x = varX-i;
+                        //i = 1;
+                        //arrowTo1 = arrowToActual;
+                        
+                        arrowToActual.x = varX-1;
                         arrowToActual.y = varY;
                         
                         while (s2.getPos(arrowToActual) == EMPTY){
+                            
                             arrowToActual.x = varX-i;
                             arrowToActual.y = varY;
                             i++;
+                            System.out.println("izquierda");
                         }
-                        vec[1] = i;
+                        //vec[1] = i;
+                        //vec.set(1, i);
                     }      
                     else if (arrowToActual.x == x-1 && arrowToActual.y == y+1){     // Diagonal superior der
-                        i = 1;
-                        arrowTo2 = arrowToActual;
-                        arrowToActual.x = varX-i;
-                        arrowToActual.y = varY+i;
+                        //i = 1;
+                        //arrowTo2 = arrowToActual;
+                        arrowToActual.x = varX-1;
+                        arrowToActual.y = varY+1;
                         
                         while (s2.getPos(arrowToActual) == EMPTY){
+                            System.out.println("cont "+i);
                             arrowToActual.x = varX-i;
                             arrowToActual.y = varY+i;
                             i++;
                         }
-                        vec[2] = i;
+                        //vec[2] = i;
+                        //vec.set(2, i);
                     }    
                     else if (arrowToActual.x == x && arrowToActual.y == y-1){       // Horizontal izq
-                        i = 1;
-                        arrowTo3 = arrowToActual;
+                        //i = 1;
+                        //arrowTo3 = arrowToActual;
                         arrowToActual.x = varX;
-                        arrowToActual.y = varY-i;
+                        arrowToActual.y = varY-1;
                         
                         while (s2.getPos(arrowToActual) == EMPTY){
                             arrowToActual.x = varX;
                             arrowToActual.y = varY-i;
                             i++;
                         }
-                        vec[3] = i;
+                        //vec[3] = i;
+                        //vec.set(3, i);
                     }      
                     else if (arrowToActual.x == x && arrowToActual.y == y+1){       // Horizontal der
-                        i = 1;
-                        arrowTo4 = arrowToActual;
+                        //i = 1;
+                        //arrowTo4 = arrowToActual;
                         arrowToActual.x = varX;
-                        arrowToActual.y = varY+i;
+                        arrowToActual.y = varY+1;
                         
                         while (s2.getPos(arrowToActual) == EMPTY){
                             arrowToActual.x = varX;
                             arrowToActual.y = varY+i;
                             i++;
                         }
-                        vec[4] = i;
+                        //vec[4] = i;
+                        //vec.set(4, i);
                     }      
                     else if (arrowToActual.x == x+1 && arrowToActual.y == y-1){     // Diagonal inferior izq
-                        i = 1;
-                        arrowTo5 = arrowToActual;
-                        arrowToActual.x = varX+i;
-                        arrowToActual.y = varY-i;
+                        //i = 1;
+                        //arrowTo5 = arrowToActual;
+                        arrowToActual.x = varX+1;
+                        arrowToActual.y = varY-1;
                         
                         while (s2.getPos(arrowToActual) == EMPTY){
                             arrowToActual.x = varX+i;
                             arrowToActual.y = varY-i;
                             i++;
                         }
-                        vec[5] = i;
+                        //vec[5] = i;
+                        //vec.set(5, i);
                     }    
                     else if (arrowToActual.x == x+1 && arrowToActual.y == y){       // Vertical inferior
-                        i = 1;
-                        arrowTo6 = arrowToActual;
-                        arrowToActual.x = varX+i;
+                        //i = 1;
+                        //arrowTo6 = arrowToActual;
+                        arrowToActual.x = varX+1;
                         arrowToActual.y = varY;
                         
                         while (s2.getPos(arrowToActual) == EMPTY){
@@ -402,38 +415,32 @@ public class Paco implements IPlayer, IAuto {
                             arrowToActual.y = varY;
                             i++;
                         }
-                        vec[6] = i;
+                        //vec[6] = i;
+                        //vec.set(6, i);
                     }      
                     else if (arrowToActual.x == x+1 && arrowToActual.y == y+1){     // Diagonal inferior der
-                        i = 1;
-                        arrowTo7 = arrowToActual;
-                        arrowToActual.x = varX+i;
-                        arrowToActual.y = varY+i;
+                        //i = 1;
+                        //arrowTo7 = arrowToActual;
+                        arrowToActual.x = varX+1;
+                        arrowToActual.y = varY+1;
                         
                         while (s2.getPos(arrowToActual) == EMPTY){
                             arrowToActual.x = varX+i;
                             arrowToActual.y = varY+i;
                             i++;
                         }
-                        vec[7] = i;
-                    }    
-                    
-                    int max = 0;
-                    for (i=0; i<vec.length;i++)
-                    {
-                        if (max < vec[i]) max = vec[i];
+                        //vec[7] = i;
+                        //vec.set(7, i);
                     }
-                    
-                    if (max == vec[0]) s2.placeArrow(arrowTo0);
-                    else if (max == vec[1]) s2.placeArrow(arrowTo1);
-                    else if (max == vec[2]) s2.placeArrow(arrowTo2);
-                    else if (max == vec[3]) s2.placeArrow(arrowTo3);
-                    else if (max == vec[4]) s2.placeArrow(arrowTo4);
-                    else if (max == vec[5]) s2.placeArrow(arrowTo5);
-                    else if (max == vec[6]) s2.placeArrow(arrowTo6);
-                    else if (max == vec[7]) s2.placeArrow(arrowTo7);*/
-                    s2.placeArrow(arrowToActual);
-                    trobat = true;
+                    System.out.println("Antes del Chivo:"+i);
+                    //int max = 0;
+                    if(i > contadorMax){
+                        System.out.println("Chivo");
+                        contadorMax = i;
+                        bestArrow = new Point(arrowToActual);
+                    }
+                    //s2.placeArrow(arrowToActual);
+                    //trobat = true;
                 }
             }
             varY++;
@@ -445,8 +452,9 @@ public class Paco implements IPlayer, IAuto {
             }
         }
         
-        if(trobat == false) arrowToActual = null;
-        return arrowToActual;
+        //if(trobat == false) arrowToActual = null;
+        //s2.placeArrow(bestArrow);
+        return bestArrow;
     }
 
     @Override
