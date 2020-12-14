@@ -300,7 +300,7 @@ public class Paco implements IPlayer, IAuto {
                 arrowToActual = new Point(varX,varY);
                 if (s2.getPos(arrowToActual) == EMPTY){
                     //System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + arrowToActual);
-                    int i;
+                    /*int i;
                     Point arrowTo0 = null;
                     Point arrowTo1 = null;
                     Point arrowTo2 = null;
@@ -319,9 +319,9 @@ public class Paco implements IPlayer, IAuto {
                         arrowToActual.x = varX-i;
                         arrowToActual.y = varY-i;
                         
-                        while (s2.getPos(arrowToActual) != EMPTY){
-                            arrowToActual.x = x-i;
-                            arrowToActual.y = y-i;
+                        while (s2.getPos(arrowToActual) == EMPTY){
+                            arrowToActual.x = varX-i;
+                            arrowToActual.y = varY-i;
                             i++;
                         }
                         vec[0] = i;
@@ -332,9 +332,9 @@ public class Paco implements IPlayer, IAuto {
                         arrowToActual.x = varX-i;
                         arrowToActual.y = varY;
                         
-                        while (s2.getPos(arrowToActual) != EMPTY){
-                            arrowToActual.x = x-i;
-                            arrowToActual.y = y;
+                        while (s2.getPos(arrowToActual) == EMPTY){
+                            arrowToActual.x = varX-i;
+                            arrowToActual.y = varY;
                             i++;
                         }
                         vec[1] = i;
@@ -345,9 +345,9 @@ public class Paco implements IPlayer, IAuto {
                         arrowToActual.x = varX-i;
                         arrowToActual.y = varY+i;
                         
-                        while (s2.getPos(arrowToActual) != EMPTY){
-                            arrowToActual.x = x-i;
-                            arrowToActual.y = y+i;
+                        while (s2.getPos(arrowToActual) == EMPTY){
+                            arrowToActual.x = varX-i;
+                            arrowToActual.y = varY+i;
                             i++;
                         }
                         vec[2] = i;
@@ -358,9 +358,9 @@ public class Paco implements IPlayer, IAuto {
                         arrowToActual.x = varX;
                         arrowToActual.y = varY-i;
                         
-                        while (s2.getPos(arrowToActual) != EMPTY){
-                            arrowToActual.x = x;
-                            arrowToActual.y = y-i;
+                        while (s2.getPos(arrowToActual) == EMPTY){
+                            arrowToActual.x = varX;
+                            arrowToActual.y = varY-i;
                             i++;
                         }
                         vec[3] = i;
@@ -371,9 +371,9 @@ public class Paco implements IPlayer, IAuto {
                         arrowToActual.x = varX;
                         arrowToActual.y = varY+i;
                         
-                        while (s2.getPos(arrowToActual) != EMPTY){
-                            arrowToActual.x = x;
-                            arrowToActual.y = y+i;
+                        while (s2.getPos(arrowToActual) == EMPTY){
+                            arrowToActual.x = varX;
+                            arrowToActual.y = varY+i;
                             i++;
                         }
                         vec[4] = i;
@@ -384,9 +384,9 @@ public class Paco implements IPlayer, IAuto {
                         arrowToActual.x = varX+i;
                         arrowToActual.y = varY-i;
                         
-                        while (s2.getPos(arrowToActual) != EMPTY){
-                            arrowToActual.x = x+i;
-                            arrowToActual.y = y-i;
+                        while (s2.getPos(arrowToActual) == EMPTY){
+                            arrowToActual.x = varX+i;
+                            arrowToActual.y = varY-i;
                             i++;
                         }
                         vec[5] = i;
@@ -397,9 +397,9 @@ public class Paco implements IPlayer, IAuto {
                         arrowToActual.x = varX+i;
                         arrowToActual.y = varY;
                         
-                        while (s2.getPos(arrowToActual) != EMPTY){
-                            arrowToActual.x = x+i;
-                            arrowToActual.y = y;
+                        while (s2.getPos(arrowToActual) == EMPTY){
+                            arrowToActual.x = varX+i;
+                            arrowToActual.y = varY;
                             i++;
                         }
                         vec[6] = i;
@@ -410,9 +410,9 @@ public class Paco implements IPlayer, IAuto {
                         arrowToActual.x = varX+i;
                         arrowToActual.y = varY+i;
                         
-                        while (s2.getPos(arrowToActual) != EMPTY){
-                            arrowToActual.x = x+i;
-                            arrowToActual.y = y+i;
+                        while (s2.getPos(arrowToActual) == EMPTY){
+                            arrowToActual.x = varX+i;
+                            arrowToActual.y = varY+i;
                             i++;
                         }
                         vec[7] = i;
@@ -431,8 +431,8 @@ public class Paco implements IPlayer, IAuto {
                     else if (max == vec[4]) s2.placeArrow(arrowTo4);
                     else if (max == vec[5]) s2.placeArrow(arrowTo5);
                     else if (max == vec[6]) s2.placeArrow(arrowTo6);
-                    else if (max == vec[7]) s2.placeArrow(arrowTo7);
-                    //s2.placeArrow(arrowToActual);
+                    else if (max == vec[7]) s2.placeArrow(arrowTo7);*/
+                    s2.placeArrow(arrowToActual);
                     trobat = true;
                 }
             }
