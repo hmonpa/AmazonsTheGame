@@ -119,7 +119,7 @@ public class Paco implements IPlayer, IAuto {
         System.out.println("MinMax- Profundidad = " + depth);
         double val_actual;
         nodesExp++;
-        if (depth == 0 || s.isGameOver()){
+        if (depth == 0 ){
             //System.out.println("Prof " + depth + " o Gameover " + s.isGameOver());
             double heu = funcio_heuristica(s, color, listEnemics);
             System.out.println("Heuristica: " + heu);
@@ -149,6 +149,7 @@ public class Paco implements IPlayer, IAuto {
                 s2.moveAmazon(s2.getAmazon(color, i), listMoviments.get(j));
 
                 listAmazonas.set(i, listMoviments.get(j)); // actualizamos las posiciones de las amazonas
+                
                 int ii = 0;
                 boolean trobat = false;
                 // Bucle tiraflechas
@@ -163,6 +164,8 @@ public class Paco implements IPlayer, IAuto {
                 }
                 s2.placeArrow(arrowToActual);
                 System.out.println("MinMax- Jugador: " + color);
+                System.out.println(s2.toString());
+                
                 //System.out.println("Print: " + s2.toString());
                 //System.out.println("booleano" + min_or_max);
                 double eval = min_max(s2, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
@@ -185,6 +188,8 @@ public class Paco implements IPlayer, IAuto {
         return val_actual;
     }
     
+    
+    
     /**
      * funcio_heuristic
      * @param s tauler
@@ -194,6 +199,32 @@ public class Paco implements IPlayer, IAuto {
      */
     public double funcio_heuristica(GameStatus s,CellType color, ArrayList<Point> listEnemics){
         
+        int contAllied=0, contEnemy=0;
+        
+        int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
+        ArrayList<Point> listAmazonas = new ArrayList<>();
+        for (int i=0; i<numAmazonas; i++){
+            listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
+        }
+        
+        for(int i=0; i< listAmazonas.size();i++){
+            contAllied = contAllied + s.getAmazonMoves(listAmazonas.get(i), false).size();
+        }
+        
+        for(int i=0; i< listEnemics.size();i++){
+            System.out.println("Reina: "+ listEnemics.get(i));
+            //ystem.out.println(s.getPos(listEnemics.get(i)));
+            
+            System.out.println(s.toString());
+            contEnemy = contEnemy + s.getAmazonMoves(listEnemics.get(i), false).size();
+        }
+        
+        
+  
+        return contEnemy - contAllied;
+        
+        
+        /*
         int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
         ArrayList<Point> listAmazonas = new ArrayList<>();
         for (int i=0; i<numAmazonas; i++){
@@ -256,7 +287,17 @@ public class Paco implements IPlayer, IAuto {
         }
         System.out.println("cont: "+cont + "  cont2: "+cont2);
         return cont2-cont;
+        */
+        
+        
+        
     }
+    
+    
+    
+    
+    
+    
     
     /**
      * primer_lliure
