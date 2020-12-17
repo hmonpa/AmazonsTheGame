@@ -26,9 +26,10 @@ public class Amazons {
                // IPlayer player2 = new HumanPlayer("Humano paco");
                 IPlayer player2 = new CarlinhosPlayer();
                 
-                new AmazonsBoard(player1 , player2, 5, Level.QUARTERBOARD);
+                new AmazonsBoard(player1 , player2, 7, Level.HALF_BOARD);
                 
             }
         });
+        
     }
 }
