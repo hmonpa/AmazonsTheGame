@@ -203,11 +203,19 @@ public class Paco implements IPlayer, IAuto {
      * @param listEnemics lista de amazonas del jugador enemic
      * @return 
      */
-    public double funcio_heuristica(GameStatus s,CellType color, ArrayList<Point> listEnemics){
+    public double funcio_heuristica(GameStatus s, CellType color, ArrayList<Point> listEnemics){
         
         System.out.println("Heuristica ");
         
+        int mida = s.getSize();
         int contAllied=0, contEnemy=0;
+        Casella[][] matrix = new Casella[mida][mida];
+        
+        for (int i=0; i<mida; i++){
+            for (int j=0; j<mida; j++){
+                
+            }
+        }
         
         int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
         ArrayList<Point> listAmazonas = new ArrayList<>();
@@ -216,17 +224,22 @@ public class Paco implements IPlayer, IAuto {
         }
         
         for(int i=0; i< listAmazonas.size();i++){
-            contAllied = contAllied + s.getAmazonMoves(listAmazonas.get(i), false).size();
+            ArrayList<Point> listMoviments = s.getAmazonMoves(listAmazonas.get(i), false);
+            int midaMoviments = listMoviments.size();
+            for (int j=0; j< midaMoviments; j++){
+                // TO DO
+            }
+            contAllied = contAllied + midaMoviments;
         }
         
         for(int i=0; i< listEnemics.size();i++){
+            
             System.out.println("Reina: "+ listEnemics.get(i));
             //ystem.out.println(s.getPos(listEnemics.get(i)));
             
-            System.out.println(s.toString());
+            //System.out.println(s.toString());
             contEnemy = contEnemy + s.getAmazonMoves(listEnemics.get(i), false).size();
         }
-        
         
   
         return contEnemy - contAllied;
@@ -335,6 +348,7 @@ public class Paco implements IPlayer, IAuto {
         }
         return arrowToActual;
     }
+    
     
     /**
      * buscarMejorTiro Dada una posicion x e y de una amazona busca.
@@ -487,3 +501,57 @@ public class Paco implements IPlayer, IAuto {
     }
 }
 
+
+// Millora de la heurística, elecció d'un propietari per a cada casella del tauler
+class Casella {
+   String owner;    // Propietari (B / N / None)
+   boolean white;   // El jugador blanc arriba a la casella?
+   boolean black;   // El jugador negre arriba a la casella? 
+   int numMovesWhite;    // Número de moviments del blanc fins a arribar a la casella
+   int numMovesBlack;    // Número de moviments del negre fins a arribar a la casella
+   
+   // Constructor
+   Casella() {
+    //this.owner = "None";
+    this.white = false;
+    this.black = false;
+    this.numMovesWhite = 10;
+    this.numMovesBlack = 10;
+   }
+   
+    // Getter
+    String getOwner(){
+       if (black && !white){
+           return "B";
+       }
+       else if (!black && white){
+           return "W";
+       }
+       else if (!black && !white){
+           if (numMovesBlack < numMovesWhite) return "B";
+           else if (numMovesWhite > numMovesBlack) return "W";
+           else return "None";
+       }
+       else {                       // Els dos arriben en un moviment
+           return "None";
+       }
+    }
+    
+    // Setters
+    void setNumBlacks(int numMovesBlack){
+        this.numMovesBlack = numMovesBlack;
+    }
+    
+    void setNumWhites(int numMovesWhite){
+        this.numMovesWhite = numMovesWhite;
+    }
+    
+    void setWhite(){
+        this.white = true;
+    }
+    
+    void setBlack(){
+        this.black = true;
+    }
+}
+    
