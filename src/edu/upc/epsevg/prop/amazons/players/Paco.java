@@ -210,12 +210,15 @@ public class Paco implements IPlayer, IAuto {
         int mida = s.getSize();
         int contAllied=0, contEnemy=0;
         Casella[][] matrix = new Casella[mida][mida];
+        //System.out.println("matriu " + matrix[0][0]);
         
         for (int i=0; i<mida; i++){
             for (int j=0; j<mida; j++){
-                
+                matrix[i][j] = new Casella();
             }
         }
+        
+        //System.out.println("matriu " + matrix[0][0]);
         
         int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
         ArrayList<Point> listAmazonas = new ArrayList<>();
@@ -223,29 +226,197 @@ public class Paco implements IPlayer, IAuto {
             listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
         }
         
+        // Busquem moviments aliats
+        boolean jugador = true;
         for(int i=0; i< listAmazonas.size();i++){
             ArrayList<Point> listMoviments = s.getAmazonMoves(listAmazonas.get(i), false);
             int midaMoviments = listMoviments.size();
             for (int j=0; j< midaMoviments; j++){
-                // TO DO
+                int x = listMoviments.get(j).x;
+                int y = listMoviments.get(j).y;
+                //System.out.println("chivato aliado ");
+                //System.out.println("x: " + x + "  y : " + y);
+                matrix[x][y].setWhite();                // es blanca 
+                //System.out.println(matrix[x][y].getOwner());
+                buscarJugadas(s, matrix, jugador, x, y, nodesExp);
+                //System.out.println(matrix[x][y].getOwner());
             }
             contAllied = contAllied + midaMoviments;
         }
         
+        // Busquem moviments enemics
         for(int i=0; i< listEnemics.size();i++){
-            
-            System.out.println("Reina: "+ listEnemics.get(i));
-            //ystem.out.println(s.getPos(listEnemics.get(i)));
-            
+            ArrayList<Point> listMoviments = s.getAmazonMoves(listEnemics.get(i), false);
+            int midaMoviments = listMoviments.size();
+            for (int j=0; j< midaMoviments; j++){
+                int x = listMoviments.get(j).x;
+                int y = listMoviments.get(j).y;
+                //System.out.println("chivato rival");
+                matrix[x][y].setBlack();                // es negra
+                buscarJugadas(s, matrix, !jugador, x, y, nodesExp);
+            }      
+            //System.out.println("Reina: "+ listEnemics.get(i));
             //System.out.println(s.toString());
-            contEnemy = contEnemy + s.getAmazonMoves(listEnemics.get(i), false).size();
+            contEnemy = contEnemy + midaMoviments;
         }
         
-  
-        return contEnemy - contAllied;
+        // Recorrem tota la matriu, per comprovar propietaris
+        int contWhites = 0, contBlacks = 0;
+        for (int i=0; i<mida; i++){
+            for (int j=0; j<mida; j++){
+                String dada = matrix[i][j].getOwner();
+                if ("B".equals(dada)) contWhites++;
+                else if ("W".equals(dada)) contBlacks++;
+            }
+        }
         
+        return contBlacks+contEnemy - contWhites+contAllied;
         
+    }
+    
+    /**
+     * 
+     * @param s
+     * @param matrix
+     * @param jugador   (TRUE = Blanc / FALSE = Negre)
+     * @param x
+     * @param y
+     * @param nodesExp 
+     */
+    public void buscarJugadas(GameStatus s, Casella matrix[][], boolean jugador, int x, int y, int nodesExp){
+        int varX = x-1, varY = y-1;
+        int conta = 0;
+         
+        while (varX <= x+1 && varY <= y+2){
+            nodesExp++; 
+            if ((varX >= 0 && varX <= 9) && (varY >=0 && varY <= 9)){
+                Point nouMoviment = new Point(varX,varY);
+     
+                // Sólo revisamos si la casilla está libre
+                if (s.getPos(nouMoviment) == EMPTY){
+                    int i = 1;
+                    int copiaX, copiaY;
+                    
+                    if (nouMoviment.x == x-1 && nouMoviment.y == y-1){          // Diagonal superior izq
+                        if (jugador) matrix[x][y].setNumWhites(5);
+                        else matrix[x][y].setNumBlacks(5);
+                        
+                        copiaX = varX-1;
+                        copiaY = varY-1;
+                        while ((copiaX >= 0 && copiaX <= 9) && (copiaY >=0 && copiaY <= 9) && s.getPos(new Point(copiaX,copiaY)) == EMPTY){
+                            copiaX = copiaX-1;
+                            copiaY = copiaY-1;
+                            i++;
+                            if (jugador) matrix[x][y].setNumWhites(5);
+                            else matrix[x][y].setNumBlacks(5);
+                        }
+                    }         
+                    else if (nouMoviment.x == x-1 && nouMoviment.y == y){       // Vertical superior         
+                        if (jugador) matrix[x][y].setNumWhites(5);
+                        else matrix[x][y].setNumBlacks(5);
+                        
+                        copiaX = varX-1;
+                        copiaY = varY;
+                        while ((copiaX >= 0 && copiaX <= 9) && (copiaY >=0 && copiaY <= 9) && s.getPos(new Point(copiaX,copiaY)) == EMPTY){
+                            copiaX = copiaX-1;
+                            i++;
+                            
+                            if (jugador) matrix[x][y].setNumWhites(5);
+                            else matrix[x][y].setNumBlacks(5);
+                        }
+                    }      
+                    else if (nouMoviment.x == x-1 && nouMoviment.y == y+1){     // Diagonal superior der
+                        if (jugador) matrix[x][y].setNumWhites(5);
+                        else matrix[x][y].setNumBlacks(5);
+                        copiaX = varX-1;
+                        copiaY = varY+1;
+                        
+                        while ((copiaX >= 0 && copiaX <= 9) && (copiaY >=0 && copiaY <= 9) && s.getPos(new Point(copiaX,copiaY)) == EMPTY){
+                            copiaX = copiaX-1;
+                            copiaY = copiaY+1;
+                            i++;
+                            if (jugador) matrix[x][y].setNumWhites(5);
+                            else matrix[x][y].setNumBlacks(5);
+                        }
+                    }    
+                    else if (nouMoviment.x == x && nouMoviment.y == y-1){       // Horizontal izq
+                        if (jugador) matrix[x][y].setNumWhites(5);
+                        else matrix[x][y].setNumBlacks(5);
+                        copiaX = varX;
+                        copiaY = varY-1;
+                        
+                        while ((copiaX >= 0 && copiaX <= 9) && (copiaY >=0 && copiaY <= 9) && s.getPos(new Point(copiaX,copiaY)) == EMPTY){
+                            copiaY = copiaY-1;
+                            i++;
+                            if (jugador) matrix[x][y].setNumWhites(5);
+                            else matrix[x][y].setNumBlacks(5);
+                        }
+                    }      
+                    else if (nouMoviment.x == x && nouMoviment.y == y+1){       // Horizontal der
+                        if (jugador) matrix[x][y].setNumWhites(5);
+                        else matrix[x][y].setNumBlacks(5);
+                        copiaX = varX;
+                        copiaY = varY+1;
+                        while ((copiaX >= 0 && copiaX <= 9) && (copiaY >=0 && copiaY <= 9) && s.getPos(new Point(copiaX,copiaY)) == EMPTY){
+                            copiaY = copiaY+1;
+                            i++;
+                            if (jugador) matrix[x][y].setNumWhites(5);
+                            else matrix[x][y].setNumBlacks(5);
+                        }
+                    }      
+                    else if (nouMoviment.x == x+1 && nouMoviment.y == y-1){     // Diagonal inferior izq
+                        if (jugador) matrix[x][y].setNumWhites(5);
+                        else matrix[x][y].setNumBlacks(5);
+                        copiaX = varX+1;
+                        copiaY = varY-1;
+                        while ((copiaX >= 0 && copiaX <= 9) && (copiaY >=0 && copiaY <= 9) && s.getPos(new Point(copiaX,copiaY)) == EMPTY){
+                            copiaX = copiaX+1;
+                            copiaY = copiaY-1;
+                            i++;
+                            if (jugador) matrix[x][y].setNumWhites(5);
+                            else matrix[x][y].setNumBlacks(5);
+                        }
+                    }    
+                    else if (nouMoviment.x == x+1 && nouMoviment.y == y){       // Vertical inferior
+                        if (jugador) matrix[x][y].setNumWhites(5);
+                        else matrix[x][y].setNumBlacks(5);
+                        copiaX = varX+1;
+                        copiaY = varY;
+                        while ((copiaX >= 0 && copiaX <= 9) && (copiaY >=0 && copiaY <= 9) && s.getPos(new Point(copiaX,copiaY)) == EMPTY){
+                            copiaX = copiaX+1;
+                            i++;
+                            if (jugador) matrix[x][y].setNumWhites(5);
+                            else matrix[x][y].setNumBlacks(5);
+                        }
+                    }      
+                    else if (nouMoviment.x == x+1 && nouMoviment.y == y+1){     // Diagonal inferior der
+                        if (jugador) matrix[x][y].setNumWhites(5);
+                        else matrix[x][y].setNumBlacks(5);
+                        copiaX = varX+1;
+                        copiaY = varY+1;
+                        while ((copiaX >= 0 && copiaX <= 9) && (copiaY >=0 && copiaY <= 9) && s.getPos(new Point(copiaX,copiaY)) == EMPTY){
+                            copiaX = copiaX+1;
+                            copiaY = copiaY+1;
+                            i++;
+                            if (jugador) matrix[x][y].setNumWhites(5);
+                            else matrix[x][y].setNumBlacks(5);
+                        }
+                    }
+                }
+            }
+            varY++;
+            conta++;
+            if (conta == 3){
+                varY = y-1;
+                varX++;
+                conta = 0;
+            }
+        }
+       
+    }
         /*
+        ANTIGUA HEURISTICA BÁSICA:
+        
         int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
         ArrayList<Point> listAmazonas = new ArrayList<>();
         for (int i=0; i<numAmazonas; i++){
@@ -309,16 +480,10 @@ public class Paco implements IPlayer, IAuto {
         System.out.println("cont: "+cont + "  cont2: "+cont2);
         return cont2-cont;
         */
-        
-        
-        
-    }
+
     
     
-    
-    
-    
-    
+
     
     /**
      * primer_lliure
