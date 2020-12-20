@@ -79,6 +79,7 @@ public class Paco implements IPlayer, IAuto {
                 //System.out.println("Movimiento de : " + s2.getAmazon(color, i) + " hacia " + listMoviments.get(j)) ;
                 Point amazonTemp = s2.getAmazon(color, i);
                 s2.moveAmazon(amazonTemp, listMoviments.get(j));
+                listAmazonas.set(i, listMoviments.get(j));
                 nodesExp++;
                 int ii = 0;
                 boolean trobat = false;
@@ -124,7 +125,8 @@ public class Paco implements IPlayer, IAuto {
         if (depth == 0 || s.isGameOver()){
             //System.out.println("Prof " + depth + " o Gameover " + s.isGameOver());
             //if(s.isGameOver()) return 0;
-            System.out.println(s.isGameOver());
+            //System.out.println("enemics abans: "+listEnemics);
+            
             double heu = funcio_heuristica(s, color, listEnemics);
             //System.out.println("Heuristica: " + heu);
             return heu;
@@ -136,10 +138,10 @@ public class Paco implements IPlayer, IAuto {
             listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
         }
         int i = 0;
-        while (i < listAmazonas.size()){
+        /*while (i < listAmazonas.size()){
             //System.out.println("MinMax- Amazona: " + i +": " + listAmazonas.get(i));
             i++;
-        }
+        }*/
         
         if(min_or_max) val_actual = Double.NEGATIVE_INFINITY; // true = max
         else val_actual = Double.POSITIVE_INFINITY; // false = min
@@ -152,8 +154,10 @@ public class Paco implements IPlayer, IAuto {
                 Point arrowToActual = null;
                 Point amazonTemp = s2.getAmazon(color, i);
                 s2.moveAmazon(amazonTemp, listMoviments.get(j));
+                //System.out.println("antes de la actualizacion:"+listAmazonas);
                 
                 listAmazonas.set(i, listMoviments.get(j)); // actualizamos las posiciones de las amazonas
+                //System.out.println("enemics abans: "+listAmazonas);
                 
                 int ii = 0;
                 boolean trobat = false;
@@ -174,7 +178,8 @@ public class Paco implements IPlayer, IAuto {
                 //System.out.println("Print: " + s2.toString());
                 //System.out.println("booleano" + min_or_max);
                 double eval = min_max(s2, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
-                listAmazonas.set(i,amazonTemp);
+                //System.out.println("despues de la llamada min_max: "+listAmazonas);
+                //if (depth == 0 || s.isGameOver()) listAmazonas.set(i,amazonTemp);
                 
                 if(min_or_max){
                     val_actual = Math.max(eval, val_actual);
@@ -205,7 +210,8 @@ public class Paco implements IPlayer, IAuto {
      */
     public double funcio_heuristica(GameStatus s, CellType color, ArrayList<Point> listEnemics){
         
-        System.out.println("Heuristica ");
+        //System.out.println("Heuristica ");
+        //System.out.println(s.toString());
         
         int mida = s.getSize();
         int contAllied=0, contEnemy=0;
@@ -244,6 +250,8 @@ public class Paco implements IPlayer, IAuto {
             contAllied = contAllied + midaMoviments;
         }
         
+        //System.out.println("enemigos: " + listEnemics);
+        
         // Busquem moviments enemics
         for(int i=0; i< listEnemics.size();i++){
             ArrayList<Point> listMoviments = s.getAmazonMoves(listEnemics.get(i), false);
@@ -265,12 +273,12 @@ public class Paco implements IPlayer, IAuto {
         for (int i=0; i<mida; i++){
             for (int j=0; j<mida; j++){
                 String dada = matrix[i][j].getOwner();
-                if ("B".equals(dada)) contWhites++;
-                else if ("W".equals(dada)) contBlacks++;
+                if ("B".equals(dada)) contBlacks+=4;
+                else if ("W".equals(dada)) contWhites+=4;
             }
         }
-        
-        return contBlacks+contEnemy - contWhites+contAllied;
+        //System.out.println();
+        return contBlacks+contEnemy  -  contWhites+contAllied;
         
     }
     

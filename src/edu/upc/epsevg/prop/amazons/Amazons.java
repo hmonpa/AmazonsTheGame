@@ -21,7 +21,7 @@ public class Amazons {
             @Override
             public void run(){
                 
-                IPlayer player1 = new Paco(3);
+                IPlayer player1 = new Paco(5);
                 //IPlayer player2 = new RandomPlayer("Falso paco");
                // IPlayer player2 = new HumanPlayer("Humano paco");
                 IPlayer player2 = new CarlinhosPlayer();
