@@ -18,104 +18,106 @@ import java.util.Random;
  */
 public class Paco implements IPlayer, IAuto {
 
-    private String name;
-    private GameStatus s;
+    private final String name;
     private double millor_moviment;
     private int depth;
     int nodesExp;
-
-    boolean hihaTemps = true;
     
-    public Paco(int depth) {
+    boolean hihaTemps;
+    Move bestMove;
+    
+    public Paco() {
         this.name = "Paco";
-        this.depth = depth;
+        this.hihaTemps = true;
     }
 
     @Override
     public Move move(GameStatus s){
+        
         millor_moviment = Double.NEGATIVE_INFINITY;
+       
         Point arrowTo = null;
         Point amazonTo = null;
         Point amazonFrom = null;
         nodesExp = 0;
-        
-        if (!s.isGameOver()){
-            CellType color = s.getCurrentPlayer();                      // Devuelve jugador actual (P1 o P2)
-        //System.out.println("Move- Jugador:" + color);
-        
-        ArrayList<Point> listAmazonas = new ArrayList<>();
-        int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
-        int i = 0;
-        for (i=0; i<numAmazonas; i++){
-            listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
-        }
-        i = 0;
-        
-        // Imprime lista de amazonas propias y sus posiciones
-        while (i < listAmazonas.size()){
-            //System.out.println("Move- Amazona " + i +": " + listAmazonas.get(i));
-            i++;
-        }
-        
-        ArrayList<Point> listEnemics = new ArrayList<>();
-        
-        boolean trobades = false;                           // Es el enemic
-        int cont = 0;                                       // Contador que busca los enemigos
-        for (i=0; i<s.getSize() && !trobades; i++){         // Filas
-            for (int j=0; j<s.getSize() && !trobades; j++){ // Columnas
-                Point t = new Point(i,j);                   // t = posición i,j
-                if (s.getPos(t) == opposite(color)) {    
-                    listEnemics.add(t);
-                    cont++;
-                    if (cont == 4) trobades = true;
-                }
-            }
-        }
-        
-        for (i=0; i<listAmazonas.size(); i++){
-            ArrayList<Point> listMoviments = s.getAmazonMoves(listAmazonas.get(i), false);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
-            for (int j=0; j<listMoviments.size(); j++){
-                GameStatus s2 = new GameStatus(s);
-                Point arrowToActual = null;
-                //System.out.println("Movimiento de : " + s2.getAmazon(color, i) + " hacia " + listMoviments.get(j)) ;
-                Point amazonTemp = s2.getAmazon(color, i);
-                s2.moveAmazon(amazonTemp, listMoviments.get(j));
-                listAmazonas.set(i, listMoviments.get(j));
-                nodesExp++;
-                int ii = 0;
-                boolean trobat = false;
+        depth = 1;
+        hihaTemps = true;
+        while (hihaTemps){
+            if (!s.isGameOver()){
                 
-                // Bucle tiraflechas
-                while (ii < listEnemics.size() && !trobat){
-                    int x = listEnemics.get(ii).x;       // COLUMNA
-                    int y = listEnemics.get(ii).y;       // FILA
-                            
-                    arrowToActual = buscarMejorTiro(x, y, s2, nodesExp);
-                    //if (arrowToActual == null) arrowToActual = new Point(5,5);
-                    if (arrowToActual == null) arrowToActual = primer_lliure(s2, nodesExp);           // Si un jugador se suicida y no tiene ningun hueco a su alrededor
-                    else trobat = true;                                            // el otro gana la partida colocando una flecha en el primer hueco libre
-                    ii++;
+                CellType color = s.getCurrentPlayer();                      // Devuelve jugador actual (P1 o P2)
+                //System.out.println("Move- Jugador:" + color);
+                ArrayList<Point> listAmazonas = new ArrayList<>();
+                int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
+
+                for (int i=0; i<numAmazonas; i++){
+                    listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
                 }
-                
-                s2.placeArrow(arrowToActual);
-                //System.out.println("Primer print: ");
-                //System.out.println(s2.toString());
+
+                ArrayList<Point> listEnemics = new ArrayList<>();
+
+                boolean trobades = false;                                   // Es el enemic
+                int cont = 0;                                               // Contador que busca los enemigos
+                for (int i=0; i<s.getSize() && !trobades; i++){             // Filas
+                    for (int j=0; j<s.getSize() && !trobades; j++){         // Columnas
+                        Point t = new Point(i,j);                           // t = posición i,j
+                        if (s.getPos(t) == opposite(color)) {    
+                            listEnemics.add(t);
+                            cont++;
+                            if (cont == 4) trobades = true;
+                        }
+                    }
+                }
+
+                for (int i=0; i<listAmazonas.size(); i++){
+                    ArrayList<Point> listMoviments = s.getAmazonMoves(listAmazonas.get(i), false);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
+                    for (int j=0; j<listMoviments.size(); j++){
+                        GameStatus s2 = new GameStatus(s);
+                        Point arrowToActual = null;
+                        //System.out.println("Movimiento de : " + s2.getAmazon(color, i) + " hacia " + listMoviments.get(j)) ;
+                        Point amazonTemp = s2.getAmazon(color, i);
+                        s2.moveAmazon(amazonTemp, listMoviments.get(j));
+                        listAmazonas.set(i, listMoviments.get(j));
+                        nodesExp++;
+                        int ii = 0;
+                        boolean trobat = false;
+
+                        // Bucle tiraflechas
+                        while (ii < listEnemics.size() && !trobat){
+                            int x = listEnemics.get(ii).x;       // COLUMNA
+                            int y = listEnemics.get(ii).y;       // FILA
+
+                            arrowToActual = buscarMejorTiro(x, y, s2, nodesExp);
+                            //if (arrowToActual == null) arrowToActual = new Point(5,5);
+                            if (arrowToActual == null) arrowToActual = primer_lliure(s2, nodesExp);           // Si un jugador se suicida y no tiene ningun hueco a su alrededor
+                            else trobat = true;                                            // el otro gana la partida colocando una flecha en el primer hueco libre
+                            ii++;
+                        }
                         
-                // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
-                double moviment = min_max(s2, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, listAmazonas, false);
-                listAmazonas.set(i,amazonTemp);
-                if(moviment > millor_moviment){
-                    amazonTo = listMoviments.get(j);
-                    amazonFrom = listAmazonas.get(i);
-                    arrowTo = arrowToActual;
-                    millor_moviment = moviment;
+                        s2.placeArrow(arrowToActual);
+
+                        // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
+                        double moviment = Double.NEGATIVE_INFINITY;
+                        if (hihaTemps) moviment = min_max(s2, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, listAmazonas, false);
+                        listAmazonas.set(i,amazonTemp);
+                        if (!hihaTemps) millor_moviment = Double.NEGATIVE_INFINITY;
+                        if(moviment >= millor_moviment){
+                            amazonTo = listMoviments.get(j);
+                            amazonFrom = listAmazonas.get(i);
+                            arrowTo = arrowToActual;
+                            millor_moviment = moviment;
+                        }
+                    }
                 }
             }
+            if (millor_moviment != Double.NEGATIVE_INFINITY) bestMove = new Move(amazonFrom, amazonTo, arrowTo, nodesExp, depth, SearchType.MINIMAX);
+            System.out.println("amazona de: " + amazonFrom + " , amazona a:  " + amazonTo + " , flecha a:  " + arrowTo + " , profundidad: " + depth);
+            depth++;
         }
-        }
+        
         //System.out.println("is game over" + s.isGameOver());
         //System.out.println("arrow " + arrowTo);
-        return new Move(amazonFrom, amazonTo, arrowTo, nodesExp, depth, SearchType.MINIMAX);
+        return bestMove;
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
@@ -131,6 +133,7 @@ public class Paco implements IPlayer, IAuto {
      * @return 
      */
     private double min_max(GameStatus s, int depth, CellType color, double alpha, double beta, ArrayList<Point> listEnemics, boolean min_or_max){
+        
         //System.out.println("MinMax- Profundidad = " + depth);
         double val_actual;
         nodesExp++;
@@ -183,15 +186,20 @@ public class Paco implements IPlayer, IAuto {
                     else trobat = true;
                     ii++;
                 }
+                System.out.println(s2.toString());
+                System.out.println("flecha a:  " + arrowToActual);
                 s2.placeArrow(arrowToActual);
                 //System.out.println("MinMax- Jugador: " + color);
                 //System.out.println(s2.toString());
                 
                 //System.out.println("Print: " + s2.toString());
                 //System.out.println("booleano" + min_or_max);
-                double eval = min_max(s2, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
-                //System.out.println("despues de la llamada min_max: "+listAmazonas);
+                double eval = Double.NEGATIVE_INFINITY;
+                if (hihaTemps) eval = min_max(s2, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
                 listAmazonas.set(i,amazonTemp);
+                if (!hihaTemps) return Double.NEGATIVE_INFINITY;
+                //System.out.println("despues de la llamada min_max: "+listAmazonas);
+                
                 
                 if(min_or_max){
                     val_actual = Math.max(eval, val_actual);
@@ -674,14 +682,13 @@ public class Paco implements IPlayer, IAuto {
 
     @Override
     public void timeout() {
-        //System.out.println("hola.");      // Se imprime tras exceder el tiempo indicado como Timeout (Amazons.java)
-        // Nothing to do! I'm so fast, I never timeout 8-)
+        // Accede tras exceder el tiempo indicado como Timeout
+        hihaTemps = false;
     }
 
     @Override
     public String getName() {
         return name;
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
 
