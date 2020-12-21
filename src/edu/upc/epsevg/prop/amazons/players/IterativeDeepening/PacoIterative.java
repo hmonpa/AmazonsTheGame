@@ -111,7 +111,7 @@ public class PacoIterative implements IPlayer, IAuto {
                 }
             }
             if (millor_moviment != Double.NEGATIVE_INFINITY) bestMove = new Move(amazonFrom, amazonTo, arrowTo, nodesExp, depth, SearchType.MINIMAX);
-            System.out.println("amazona de: " + amazonFrom + " , amazona a:  " + amazonTo + " , flecha a:  " + arrowTo + " , profundidad: " + depth);
+            //System.out.println("amazona de: " + amazonFrom + " , amazona a:  " + amazonTo + " , flecha a:  " + arrowTo + " , profundidad: " + depth);
             depth++;
         }
         
@@ -186,8 +186,7 @@ public class PacoIterative implements IPlayer, IAuto {
                     else trobat = true;
                     ii++;
                 }
-                System.out.println(s2.toString());
-                System.out.println("flecha a:  " + arrowToActual);
+                
                 s2.placeArrow(arrowToActual);
                 //System.out.println("MinMax- Jugador: " + color);
                 //System.out.println(s2.toString());
@@ -338,12 +337,31 @@ public class PacoIterative implements IPlayer, IAuto {
                     if (nouMoviment.x == x-1 && nouMoviment.y == y-1){          // Diagonal superior izq
                         if (jugador) matrix[x][y].setNumAllied(5);
                         else matrix[x][y].setNumEnemy(5);
-                        
-                        copiaX = varX-1;
-                        copiaY = varY-1;
+                        int maxbuides = 0;                                      // En cada movimiento, revisa el máximo de vacías que hay a su alrededor
+                        copiaX = varX;
+                        copiaY = varY;
                         while ((copiaX >= 0 && copiaX <= 9) && (copiaY >=0 && copiaY <= 9) && s.getPos(new Point(copiaX,copiaY)) == EMPTY){
+                            int buides = 0;
+                            // Por cada movimiento en una dirección, revisa las casillas de su alrededor...
+                            if (s.getPos(new Point(copiaX-1,copiaY-1)) == EMPTY) buides++;
+                            if (s.getPos(new Point(copiaX,copiaY-1)) == EMPTY) buides++;
+                            if (s.getPos(new Point(copiaX+1,copiaY-1)) == EMPTY) buides++;    
+                            if (s.getPos(new Point(copiaX-1,copiaY)) == EMPTY) buides++;
+                            if (s.getPos(new Point(copiaX+1,copiaY)) == EMPTY) buides++;
+                            if (s.getPos(new Point(copiaX-1,copiaY+1)) == EMPTY) buides++;
+                            if (s.getPos(new Point(copiaX,copiaY+1)) == EMPTY) buides++;
+                            if (s.getPos(new Point(copiaX+1,copiaY+1)) == EMPTY) buides++;
+                            
+                            if (maxbuides < buides){
+                                // POR TERMINAR...
+                                maxbuides = buides;
+                                //s.getPos(copiaX,copiaY);    // Esta es la posición más segura a la que moverse
+                                
+                            }
+                            // Sigue modificando copiaX y copiaY en la dirección indicada (diagonal superior izq en este caso) hasta que no encuentre un Empty
                             copiaX = copiaX-1;
                             copiaY = copiaY-1;
+                            // Y sigue marcando territorio
                             if (jugador) matrix[x][y].setNumAllied(5);
                             else matrix[x][y].setNumEnemy(5);
                         }
