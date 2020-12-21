@@ -21,16 +21,17 @@ public class Paco implements IPlayer, IAuto {
     private String name;
     private GameStatus s;
     private double millor_moviment;
-    //private Level level;
     private int depth;
     int nodesExp;
+
+    boolean hihaTemps = true;
     
     public Paco(int depth) {
         this.name = "Paco";
         this.depth = depth;
     }
 
-    //@Override
+    @Override
     public Move move(GameStatus s){
         millor_moviment = Double.NEGATIVE_INFINITY;
         Point arrowTo = null;
@@ -118,6 +119,17 @@ public class Paco implements IPlayer, IAuto {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+    /**
+     * 
+     * @param s
+     * @param depth
+     * @param color
+     * @param alpha
+     * @param beta
+     * @param listEnemics
+     * @param min_or_max
+     * @return 
+     */
     private double min_max(GameStatus s, int depth, CellType color, double alpha, double beta, ArrayList<Point> listEnemics, boolean min_or_max){
         //System.out.println("MinMax- Profundidad = " + depth);
         double val_actual;
@@ -249,8 +261,6 @@ public class Paco implements IPlayer, IAuto {
             }
             contAllied = contAllied + midaMoviments;
         }
-        
-        //System.out.println("enemigos: " + listEnemics);
         
         // Busquem moviments enemics
         for(int i=0; i< listEnemics.size();i++){
@@ -650,6 +660,7 @@ public class Paco implements IPlayer, IAuto {
 
     @Override
     public void timeout() {
+        //System.out.println("hola.");      // Se imprime tras exceder el tiempo indicado como Timeout (Amazons.java)
         // Nothing to do! I'm so fast, I never timeout 8-)
     }
 
@@ -713,4 +724,3 @@ class Casella {
         this.enemy = true;
     }
 }
-    

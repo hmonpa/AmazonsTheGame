@@ -283,6 +283,7 @@ public class AmazonsBoard extends MouseAdapter {
                 boardPanel.repaint();
                 endTurn();
             } catch (Exception ignore) {
+                ignore.printStackTrace();           // Línia afegida
             }
         }
 

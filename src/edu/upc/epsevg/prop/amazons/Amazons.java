@@ -21,12 +21,12 @@ public class Amazons {
             @Override
             public void run(){
                 
-                IPlayer player1 = new Paco(3);
+                IPlayer player1 = new Paco(10);
                 //IPlayer player2 = new RandomPlayer("Falso paco");
                // IPlayer player2 = new HumanPlayer("Humano paco");
                 IPlayer player2 = new CarlinhosPlayer();
                 
-                new AmazonsBoard(player2 , player1, 7, Level.HALF_BOARD);
+                new AmazonsBoard(player1 , player2, 4, Level.HALF_BOARD);
                 
             }
         });
