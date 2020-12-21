@@ -10,10 +10,10 @@ import edu.upc.epsevg.prop.amazons.Move;
 import edu.upc.epsevg.prop.amazons.SearchType;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.Random;
 
 /**
- *
+ * 
  * @author Héctor Montesinos, César Médina
  */
 public class Paco implements IPlayer, IAuto {
@@ -211,6 +211,20 @@ public class Paco implements IPlayer, IAuto {
         return val_actual;
     }
     
+    
+    public void zobrist(GameStatus s){
+        int mida = s.getSize();
+        int peces = s.getNumberOfAmazonsForEachColor();
+        long matrix[][] = new long[mida][mida];
+        
+        Random random = new Random();
+        
+        for(int i=0; i<mida; i++){
+            for (int j=0; j<peces; j++){
+                matrix[i][j] = random.nextLong();
+            }
+        }
+    }
     
     
     /**
@@ -724,3 +738,4 @@ class Casella {
         this.enemy = true;
     }
 }
+
