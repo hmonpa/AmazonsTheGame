@@ -2,7 +2,8 @@ package edu.upc.epsevg.prop.amazons;
 
 import edu.upc.epsevg.prop.amazons.players.HumanPlayer;
 import edu.upc.epsevg.prop.amazons.players.CarlinhosPlayer;
-import edu.upc.epsevg.prop.amazons.players.Paco;
+import edu.upc.epsevg.prop.amazons.players.DepthFixed.Paco;
+import edu.upc.epsevg.prop.amazons.players.IterativeDeepening.PacoIterative;
 import edu.upc.epsevg.prop.amazons.players.RandomPlayer;
 import javax.swing.SwingUtilities;
 
@@ -21,7 +22,10 @@ public class Amazons {
             @Override
             public void run(){
                 
-                IPlayer player1 = new Paco();
+                // DepthFixed
+                IPlayer depthy = new Paco(3);
+                // IterativeDeepening
+                IPlayer player1 = new PacoIterative();
                 //IPlayer player2 = new RandomPlayer("Falso paco");
                // IPlayer player2 = new HumanPlayer("Humano paco");
                 IPlayer player2 = new CarlinhosPlayer();

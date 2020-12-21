@@ -1,4 +1,4 @@
-package edu.upc.epsevg.prop.amazons.players;
+package edu.upc.epsevg.prop.amazons.players.IterativeDeepening;
 
 import edu.upc.epsevg.prop.amazons.CellType;
 import static edu.upc.epsevg.prop.amazons.CellType.*;
@@ -16,7 +16,7 @@ import java.util.Random;
  * 
  * @author Héctor Montesinos, César Médina
  */
-public class Paco implements IPlayer, IAuto {
+public class PacoIterative implements IPlayer, IAuto {
 
     private final String name;
     private double millor_moviment;
@@ -26,7 +26,7 @@ public class Paco implements IPlayer, IAuto {
     boolean hihaTemps;
     Move bestMove;
     
-    public Paco() {
+    public PacoIterative() {
         this.name = "Paco";
         this.hihaTemps = true;
     }

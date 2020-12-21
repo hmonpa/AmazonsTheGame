@@ -1,4 +1,4 @@
-package edu.upc.epsevg.prop.amazons.players;
+package edu.upc.epsevg.prop.amazons.players.DepthFixed;
 
 import edu.upc.epsevg.prop.amazons.CellType;
 import static edu.upc.epsevg.prop.amazons.CellType.*;
