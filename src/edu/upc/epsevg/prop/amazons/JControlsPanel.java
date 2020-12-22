@@ -51,14 +51,14 @@ public class JControlsPanel extends javax.swing.JPanel implements ActionListener
         if (name.length() > 10) {
             name = name.substring(0, 10) + 1;
         }
-        lblPlayer1.setText("Player 1: " + name);
+        lblPlayer1.setText("White: " + name);
     }
 
     public void setPlayer2Name(String name) {
         if (name.length() > 10) {
             name = name.substring(0, 10) + 1;
         }
-        lblPlayer2.setText("Player 2: " + name);
+        lblPlayer2.setText("Black: " + name);
     }
 
     public void setThinking(boolean thinking) {

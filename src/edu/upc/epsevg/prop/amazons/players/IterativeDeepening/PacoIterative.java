@@ -22,13 +22,14 @@ public class PacoIterative implements IPlayer, IAuto {
     private double millor_moviment;
     private int depth;
     int nodesExp;
-    
+    int nodesQuarterBoard;
     boolean hihaTemps;
     Move bestMove;
     
     public PacoIterative() {
-        this.name = "Paco";
+        this.name = "Paco iter";
         this.hihaTemps = true;
+        this.nodesQuarterBoard = 23;
     }
 
     @Override
@@ -42,6 +43,7 @@ public class PacoIterative implements IPlayer, IAuto {
         nodesExp = 0;
         depth = 1;
         hihaTemps = true;
+        
         while (hihaTemps && depth <= s.getEmptyCellsCount()){
             if (!s.isGameOver()){
                 
@@ -79,51 +81,68 @@ public class PacoIterative implements IPlayer, IAuto {
                         s2.moveAmazon(amazonTemp, listMoviments.get(j));
                         listAmazonas.set(i, listMoviments.get(j));
                         nodesExp++;
-                        //int ii = 0;
-                        //boolean trobat = false;
-
-                        // Bucle tiraflechas
-                        /*while (ii < listEnemics.size() && !trobat){
-                            int x = listEnemics.get(ii).x;       // COLUMNA
-                            int y = listEnemics.get(ii).y;       // FILA
-
-                            //arrowToActual = buscarMejorTiro(x, y, s2, nodesExp);
-                            //if (arrowToActual == null) arrowToActual = new Point(5,5);
-                            //if (arrowToActual == null) arrowToActual = primer_lliure(s2, nodesExp);           // Si un jugador se suicida y no tiene ningun hueco a su alrededor
-                            //else trobat = true;                                            // el otro gana la partida colocando una flecha en el primer hueco libre
-                            //ii++;
-                        }*/
                         
-                        double millor_moviment_fletxa = Double.NEGATIVE_INFINITY;
-                        Point millor_fletxa = null;
-                        
-                        arrowToActual = null;
-                        for(int ii=0;ii<s2.getSize();ii++){
-                            for(int jj=0; jj<s2.getSize();jj++){
-                                nodesExp++;
-                                arrowToActual = new Point(jj, ii);
-                                if (s2.getPos(arrowToActual) == EMPTY){
-                                     GameStatus s3 = new GameStatus(s2);
-                                     s3.placeArrow(arrowToActual);
-                                     //System.out.println(s3.toString());
-                                     // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
-                                    double moviment_fletxa = Double.NEGATIVE_INFINITY;
-                                    if (hihaTemps) moviment_fletxa = min_max(s3, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, listAmazonas, false);
-                                    if(moviment_fletxa >= millor_moviment_fletxa){
-                                        millor_moviment_fletxa = moviment_fletxa;
-                                        millor_fletxa = arrowToActual;
-                                    }
-                                    if (!hihaTemps) millor_moviment = Double.NEGATIVE_INFINITY;
-                                    
-                                }
+                        if (s2.getEmptyCellsCount() > nodesQuarterBoard){
+                            //System.out.println("tengo más de 23");
+                            int ii = 0;
+                            boolean trobat = false;
+
+                            // Bucle tiraflechas
+                            while (ii < listEnemics.size() && !trobat){
+                                int x = listEnemics.get(ii).x;       // COLUMNA
+                                int y = listEnemics.get(ii).y;       // FILA
+
+                                arrowToActual = buscarMejorTiro(x, y, s2, nodesExp);
+                                if (arrowToActual == null) arrowToActual = primer_lliure(s2, nodesExp);           // Si un jugador se suicida y no tiene ningun hueco a su alrededor
+                                else trobat = true;                                            // el otro gana la partida colocando una flecha en el primer hueco libre
+                                ii++;
+                            }
+                            
+                            s2.placeArrow(arrowToActual);
+
+                            // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
+                            double moviment = min_max(s2, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, listAmazonas, false);
+                            listAmazonas.set(i,amazonTemp);
+                            if(moviment > millor_moviment){
+                                amazonTo = listMoviments.get(j);
+                                amazonFrom = listAmazonas.get(i);
+                                arrowTo = arrowToActual;
+                                millor_moviment = moviment;
                             }
                         }
-                        listAmazonas.set(i,amazonTemp);
-                        if(millor_moviment_fletxa >= millor_moviment ){
-                            amazonTo = listMoviments.get(j);
-                            amazonFrom = listAmazonas.get(i);
-                            arrowTo = millor_fletxa;
-                            millor_moviment = millor_moviment_fletxa;
+                        else {
+                            //System.out.println("tengo menos de 23");
+                            double millor_moviment_fletxa = Double.NEGATIVE_INFINITY;
+                            Point millor_fletxa = null;
+
+                            arrowToActual = null;
+                            for(int ii=0;ii<s2.getSize();ii++){
+                                for(int jj=0; jj<s2.getSize();jj++){
+                                    nodesExp++;
+                                    arrowToActual = new Point(jj, ii);
+                                    if (s2.getPos(arrowToActual) == EMPTY){
+                                         GameStatus s3 = new GameStatus(s2);
+                                         s3.placeArrow(arrowToActual);
+                                         //System.out.println(s3.toString());
+                                         // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
+                                        double moviment_fletxa = Double.NEGATIVE_INFINITY;
+                                        if (hihaTemps) moviment_fletxa = min_max(s3, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, listAmazonas, false);
+                                        if (moviment_fletxa >= millor_moviment_fletxa){
+                                            millor_moviment_fletxa = moviment_fletxa;
+                                            millor_fletxa = arrowToActual;
+                                        }
+                                        if (!hihaTemps) millor_moviment = Double.NEGATIVE_INFINITY;
+
+                                    }
+                                }
+                            }
+                            listAmazonas.set(i,amazonTemp);
+                            if (millor_moviment_fletxa >= millor_moviment ){
+                                amazonTo = listMoviments.get(j);
+                                amazonFrom = listAmazonas.get(i);
+                                arrowTo = millor_fletxa;
+                                millor_moviment = millor_moviment_fletxa;
+                            }
                         }
                     }
                 }
@@ -194,73 +213,87 @@ public class PacoIterative implements IPlayer, IAuto {
                 
                 listAmazonas.set(i, listMoviments.get(j)); // actualizamos las posiciones de las amazonas
                 //System.out.println("enemics abans: "+listAmazonas);
-                
-                /*int ii = 0;
-                boolean trobat = false;
-                // Bucle tiraflechas
-                while (ii < listEnemics.size() && !trobat){
-                    int x = listEnemics.get(ii).x;       // COLUMNA
-                    int y = listEnemics.get(ii).y;       // FILA
+                if (s2.getEmptyCellsCount() > nodesQuarterBoard){
+                    int ii = 0;
+                    boolean trobat = false;
+                    // Bucle tiraflechas
+                    while (ii < listEnemics.size() && !trobat){
+                        int x = listEnemics.get(ii).x;       // COLUMNA
+                        int y = listEnemics.get(ii).y;       // FILA
 
-                    arrowToActual = buscarMejorTiro(x, y, s2, nodesExp);
-                    if (arrowToActual == null) arrowToActual = primer_lliure(s2, nodesExp);          
-                    else trobat = true;
-                    ii++;
-                }*/
-                
-                //s2.placeArrow(arrowToActual);
-                //System.out.println("MinMax- Jugador: " + color);
-                //System.out.println(s2.toString());
-                
-                //System.out.println("Print: " + s2.toString());
-                //System.out.println("booleano" + min_or_max);
-                //double eval = Double.NEGATIVE_INFINITY;
-                //if (hihaTemps) eval = min_max(s2, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
-                //listAmazonas.set(i,amazonTemp);
-                //if (!hihaTemps) return Double.NEGATIVE_INFINITY;
-                //System.out.println("despues de la llamada min_max: "+listAmazonas);
-                
-                
+                        arrowToActual = buscarMejorTiro(x, y, s2, nodesExp);
+                        if (arrowToActual == null) arrowToActual = primer_lliure(s2, nodesExp);          
+                        else trobat = true;
+                        ii++;
+                    }
+
+                    s2.placeArrow(arrowToActual);
+                    //System.out.println("MinMax- Jugador: " + color);
+                    //System.out.println(s2.toString());
+
+                    //System.out.println("Print: " + s2.toString());
+                    //System.out.println("booleano" + min_or_max);
+                    double eval = Double.NEGATIVE_INFINITY;
+                    if (hihaTemps) eval = min_max(s2, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
+                    listAmazonas.set(i,amazonTemp);
+                    if(min_or_max){
+                        val_actual = Math.max(eval, val_actual);
+                        alpha = Math.max(alpha, eval);
+                        if(beta <= alpha) return val_actual;
+                        //System.out.println("Estoy en MAX");
+                    }
+                    else{
+                        val_actual = Math.min(eval, val_actual);
+                        beta = Math.min(beta, eval);
+                        if (beta <= alpha) return val_actual;
+                        //System.out.println("Estoy en MIN");
+                    }
+                    if (!hihaTemps) return Double.NEGATIVE_INFINITY;
+                    //System.out.println("despues de la llamada min_max: "+listAmazonas);
+                }
+                else {
+                //System.out.println("Minimax: tengo menos de 23");
                 //double millor_moviment_fletxa = Double.NEGATIVE_INFINITY;
                 //Point millor_fletxa = null;
                         
-                arrowToActual = null;
-                for(int ii=0;ii<s2.getSize();ii++){
-                    for(int jj=0; jj<s2.getSize();jj++){
-                        nodesExp++;
-                        arrowToActual = new Point(jj, ii);
-                        if (s2.getPos(arrowToActual) == EMPTY){
-                             GameStatus s3 = new GameStatus(s2);
-                             s3.placeArrow(arrowToActual);
-                             //System.out.println(s3.toString());
-                             // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
-                            //double moviment_fletxa = Double.NEGATIVE_INFINITY;
-                            double eval = Double.NEGATIVE_INFINITY;
-                            if (hihaTemps) eval = min_max(s3, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
-                            if(min_or_max){
-                                val_actual = Math.max(eval, val_actual);
-                                alpha = Math.max(alpha, eval);
-                                if(beta <= alpha) return val_actual;
-                                //System.out.println("Estoy en MAX");
+                    arrowToActual = null;
+                    for(int ii=0;ii<s2.getSize();ii++){
+                        for(int jj=0; jj<s2.getSize();jj++){
+                            nodesExp++;
+                            arrowToActual = new Point(jj, ii);
+                            if (s2.getPos(arrowToActual) == EMPTY){
+                                 GameStatus s3 = new GameStatus(s2);
+                                 s3.placeArrow(arrowToActual);
+                                 //System.out.println(s3.toString());
+                                 // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
+                                //double moviment_fletxa = Double.NEGATIVE_INFINITY;
+                                double eval = Double.NEGATIVE_INFINITY;
+                                if (hihaTemps) eval = min_max(s3, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
+                                if(min_or_max){
+                                    val_actual = Math.max(eval, val_actual);
+                                    alpha = Math.max(alpha, eval);
+                                    if(beta <= alpha) return val_actual;
+                                    //System.out.println("Estoy en MAX");
+                                }
+                                else{
+                                    val_actual = Math.min(eval, val_actual);
+                                    beta = Math.min(beta, eval);
+                                    if (beta <= alpha) return val_actual;
+                                    //System.out.println("Estoy en MIN");
+                                }
+                                if (!hihaTemps) return Double.NEGATIVE_INFINITY;
+                                /*if(moviment_fletxa >= millor_moviment_fletxa){
+                                    millor_moviment_fletxa = moviment_fletxa;
+                                    millor_fletxa = arrowToActual;
+                                }*/
+                                //if (!hihaTemps) millor_moviment = Double.NEGATIVE_INFINITY;
+
+
                             }
-                            else{
-                                val_actual = Math.min(eval, val_actual);
-                                beta = Math.min(beta, eval);
-                                if (beta <= alpha) return val_actual;
-                                //System.out.println("Estoy en MIN");
-                            }
-                            if (!hihaTemps) return Double.NEGATIVE_INFINITY;
-                            /*if(moviment_fletxa >= millor_moviment_fletxa){
-                                millor_moviment_fletxa = moviment_fletxa;
-                                millor_fletxa = arrowToActual;
-                            }*/
-                            //if (!hihaTemps) millor_moviment = Double.NEGATIVE_INFINITY;
-                            
-                            
                         }
                     }
+                    listAmazonas.set(i,amazonTemp);
                 }
-                listAmazonas.set(i,amazonTemp);
             }
         } 
       
