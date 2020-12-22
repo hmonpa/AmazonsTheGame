@@ -42,7 +42,7 @@ public class PacoIterative implements IPlayer, IAuto {
         nodesExp = 0;
         depth = 1;
         hihaTemps = true;
-        while (hihaTemps && depth <= s.getEmptyCellsCount()){
+        //while (hihaTemps && depth <= s.getEmptyCellsCount()){
             if (!s.isGameOver()){
                 
                 CellType color = s.getCurrentPlayer();                      // Devuelve jugador actual (P1 o P2)
@@ -79,42 +79,65 @@ public class PacoIterative implements IPlayer, IAuto {
                         s2.moveAmazon(amazonTemp, listMoviments.get(j));
                         listAmazonas.set(i, listMoviments.get(j));
                         nodesExp++;
-                        int ii = 0;
-                        boolean trobat = false;
+                        //int ii = 0;
+                        //boolean trobat = false;
 
                         // Bucle tiraflechas
-                        while (ii < listEnemics.size() && !trobat){
+                        /*while (ii < listEnemics.size() && !trobat){
                             int x = listEnemics.get(ii).x;       // COLUMNA
                             int y = listEnemics.get(ii).y;       // FILA
 
-                            arrowToActual = buscarMejorTiro(x, y, s2, nodesExp);
+                            //arrowToActual = buscarMejorTiro(x, y, s2, nodesExp);
                             //if (arrowToActual == null) arrowToActual = new Point(5,5);
-                            if (arrowToActual == null) arrowToActual = primer_lliure(s2, nodesExp);           // Si un jugador se suicida y no tiene ningun hueco a su alrededor
-                            else trobat = true;                                            // el otro gana la partida colocando una flecha en el primer hueco libre
-                            ii++;
+                            //if (arrowToActual == null) arrowToActual = primer_lliure(s2, nodesExp);           // Si un jugador se suicida y no tiene ningun hueco a su alrededor
+                            //else trobat = true;                                            // el otro gana la partida colocando una flecha en el primer hueco libre
+                            //ii++;
+                        }*/
+                        
+                        double millor_moviment_fletxa = Double.NEGATIVE_INFINITY;
+                        Point millor_fletxa = null;
+                        
+                        arrowToActual = null;
+                        for(int ii=0;ii<s2.getSize();ii++){
+                            for(int jj=0; jj<s2.getSize();jj++){
+                                nodesExp++;
+                                arrowToActual = new Point(jj, ii);
+                                if (s2.getPos(arrowToActual) == EMPTY){
+                                     GameStatus s3 = new GameStatus(s2);
+                                     s3.placeArrow(arrowToActual);
+                                     System.out.println(s3.toString());
+                                     // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
+                                    double moviment_fletxa = Double.NEGATIVE_INFINITY;
+                                    if (hihaTemps) moviment_fletxa = min_max(s3, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, listAmazonas, false);
+                                    if(moviment_fletxa >= millor_moviment_fletxa){
+                                        millor_moviment_fletxa = moviment_fletxa;
+                                        millor_fletxa = arrowToActual;
+                                    }
+                                    if (!hihaTemps) millor_moviment = Double.NEGATIVE_INFINITY;
+                                    
+                                }
+                            }
+                        }
+                        listAmazonas.set(i,amazonTemp);
+                        if(millor_moviment_fletxa >= millor_moviment ){
+                                        amazonTo = listMoviments.get(j);
+                                        amazonFrom = listAmazonas.get(i);
+                                        arrowTo = millor_fletxa;
+                                        millor_moviment = millor_moviment_fletxa;
                         }
                         
-                        s2.placeArrow(arrowToActual);
+                        
 
-                        // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
-                        double moviment = Double.NEGATIVE_INFINITY;
-                        if (hihaTemps) moviment = min_max(s2, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, listAmazonas, false);
-                        listAmazonas.set(i,amazonTemp);
-                        if (!hihaTemps) millor_moviment = Double.NEGATIVE_INFINITY;
-                        if(moviment >= millor_moviment){
-                            amazonTo = listMoviments.get(j);
-                            amazonFrom = listAmazonas.get(i);
-                            arrowTo = arrowToActual;
-                            millor_moviment = moviment;
-                        }
+                        
                     }
                 }
             }
             if (millor_moviment != Double.NEGATIVE_INFINITY) bestMove = new Move(amazonFrom, amazonTo, arrowTo, nodesExp, depth, SearchType.MINIMAX);
-            //System.out.println("amazona de: " + amazonFrom + " , amazona a:  " + amazonTo + " , flecha a:  " + arrowTo + " , profundidad: " + depth);
-            depth++;
-        }
         
+            System.out.println("amazona de: " + amazonFrom + " , amazona a:  " + amazonTo + " , flecha a:  " + arrowTo + " , profundidad: " + depth);
+            //depth++;
+        //}
+        //System.out.println("Acaba");
         //System.out.println("is game over" + s.isGameOver());
         //System.out.println("arrow " + arrowTo);
         return bestMove;
@@ -142,6 +165,7 @@ public class PacoIterative implements IPlayer, IAuto {
             //if(s.isGameOver()) return 0;
             //System.out.println("enemics abans: "+listEnemics);
             
+            System.out.println(s.toString());
             double heu = funcio_heuristica(s, color, listEnemics);
             //System.out.println("Heuristica: " + heu);
             return heu;
