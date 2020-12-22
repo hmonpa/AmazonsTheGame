@@ -42,7 +42,7 @@ public class PacoIterative implements IPlayer, IAuto {
         nodesExp = 0;
         depth = 1;
         hihaTemps = true;
-        while (hihaTemps){
+        while (hihaTemps && depth <= s.getEmptyCellsCount()){
             if (!s.isGameOver()){
                 
                 CellType color = s.getCurrentPlayer();                      // Devuelve jugador actual (P1 o P2)
@@ -337,13 +337,16 @@ public class PacoIterative implements IPlayer, IAuto {
                     if (nouMoviment.x == x-1 && nouMoviment.y == y-1){          // Diagonal superior izq
                         if (jugador) matrix[x][y].setNumAllied(5);
                         else matrix[x][y].setNumEnemy(5);
-                        int maxbuides = 0;                                      // En cada movimiento, revisa el máximo de vacías que hay a su alrededor
-                        copiaX = varX;
-                        copiaY = varY;
+                        //int maxbuides = 0;                                      // En cada movimiento, revisa el máximo de vacías que hay a su alrededor
+                        copiaX = varX-1;
+                        copiaY = varY-1;
+                        
+                        //copiaX = varX;
+                        //copiaY = varY;
                         while ((copiaX >= 0 && copiaX <= 9) && (copiaY >=0 && copiaY <= 9) && s.getPos(new Point(copiaX,copiaY)) == EMPTY){
-                            int buides = 0;
+                            //int buides = 0;
                             // Por cada movimiento en una dirección, revisa las casillas de su alrededor...
-                            if (s.getPos(new Point(copiaX-1,copiaY-1)) == EMPTY) buides++;
+                           /* if (s.getPos(new Point(copiaX-1,copiaY-1)) == EMPTY) buides++;
                             if (s.getPos(new Point(copiaX,copiaY-1)) == EMPTY) buides++;
                             if (s.getPos(new Point(copiaX+1,copiaY-1)) == EMPTY) buides++;    
                             if (s.getPos(new Point(copiaX-1,copiaY)) == EMPTY) buides++;
@@ -357,7 +360,7 @@ public class PacoIterative implements IPlayer, IAuto {
                                 maxbuides = buides;
                                 //s.getPos(copiaX,copiaY);    // Esta es la posición más segura a la que moverse
                                 
-                            }
+                            }*/
                             // Sigue modificando copiaX y copiaY en la dirección indicada (diagonal superior izq en este caso) hasta que no encuentre un Empty
                             copiaX = copiaX-1;
                             copiaY = copiaY-1;
