@@ -8,13 +8,13 @@ Se clasifica como juego de tablero, abstracto y territorial; al igual que el go 
 Se enfrentan dos jugadores, con cuatro amazonas cada uno, sobre un tablero de 10x10. Un jugador lleva las amazonas blancas y el otro las negras.
 Los jugadores hacen sus movimientos por turnos, comenzando a mover las blancas.
 
- ![alt text](https://lh3.googleusercontent.com/proxy/AjnGbvdD0VACj0poXZNB99lDTSoqBpdkyrwLUcsiH2RssB8LZavVpo4m5HH3pJ6R-XiN6GWnfQ-uoPlkaF7JOhkK4ffazpk)
-
+  ![AmazonBoard](https://github.com/hmonpa/AmazonsTheGame/blob/master/AmazonsBoard.png)
 
 ## Movimientos
 Un movimiento tiene dos etapas. En la primera se mueve cualquiera de las amazonas a una casilla distinta a la que estaba, siguiendo una dirección diagonal u ortogonal, igual que se mueve una reina de ajedrez. En la segunda etapa la amazona que se ha movido lanza una flecha, desde la casilla de destino, en dirección diagonal u ortogonal, a otra casilla.
  
- ![alt text](https://lh3.googleusercontent.com/proxy/fwFetvkRCKexYjEKTziwIZiqjQdX1nRciTOxzA7RjnbeYfQOPHfTxIKtOfL7r2t6JWVpkljcCn4zVSHqzlaqDlk0ZcYnVFvxJAc)
+
+  ![QueenMoves](https://github.com/hmonpa/AmazonsTheGame/blob/master/QueenMoves.png)
 
 Las amazonas no pueden moverse a las casillas alcanzadas por una flecha u ocupadas por otra amazona, moverse a través de ellas, lanzar flechas a esas casillas, o lanzar flechas a través de ellas.
 
