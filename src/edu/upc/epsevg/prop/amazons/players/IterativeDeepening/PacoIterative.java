@@ -115,7 +115,7 @@ public class PacoIterative implements IPlayer, IAuto {
                             double millor_moviment_fletxa = Double.NEGATIVE_INFINITY;
                             Point millor_fletxa = null;
 
-                            arrowToActual = null;
+                            //arrowToActual = null;
                             for(int ii=0;ii<s2.getSize();ii++){
                                 for(int jj=0; jj<s2.getSize();jj++){
                                     nodesExp++;
@@ -236,27 +236,29 @@ public class PacoIterative implements IPlayer, IAuto {
                     double eval = Double.NEGATIVE_INFINITY;
                     if (hihaTemps) eval = min_max(s2, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
                     listAmazonas.set(i,amazonTemp);
-                    if(min_or_max){
+                    if(min_or_max){ //MAX
                         val_actual = Math.max(eval, val_actual);
-                        alpha = Math.max(alpha, eval);
+                        //alpha = Math.max(alpha, eval);
+                        alpha = Math.max(alpha, val_actual);
                         if(beta <= alpha) return val_actual;
                         //System.out.println("Estoy en MAX");
                     }
-                    else{
+                    else{ //MIN
                         val_actual = Math.min(eval, val_actual);
-                        beta = Math.min(beta, eval);
+                        //beta = Math.min(beta, eval);
+                        beta = Math.min(beta, val_actual);
                         if (beta <= alpha) return val_actual;
                         //System.out.println("Estoy en MIN");
                     }
                     if (!hihaTemps) return Double.NEGATIVE_INFINITY;
                     //System.out.println("despues de la llamada min_max: "+listAmazonas);
                 }
+                
                 else {
                 //System.out.println("Minimax: tengo menos de 23");
                 //double millor_moviment_fletxa = Double.NEGATIVE_INFINITY;
                 //Point millor_fletxa = null;
-                        
-                    arrowToActual = null;
+                    //arrowToActual = null;
                     for(int ii=0;ii<s2.getSize();ii++){
                         for(int jj=0; jj<s2.getSize();jj++){
                             nodesExp++;
@@ -269,15 +271,17 @@ public class PacoIterative implements IPlayer, IAuto {
                                 //double moviment_fletxa = Double.NEGATIVE_INFINITY;
                                 double eval = Double.NEGATIVE_INFINITY;
                                 if (hihaTemps) eval = min_max(s3, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
-                                if(min_or_max){
+                                if(min_or_max){ // MAX
                                     val_actual = Math.max(eval, val_actual);
-                                    alpha = Math.max(alpha, eval);
+                                    //alpha = Math.max(alpha, eval);
+                                    alpha = Math.max(alpha, val_actual);
                                     if(beta <= alpha) return val_actual;
                                     //System.out.println("Estoy en MAX");
                                 }
-                                else{
+                                else{ // Min
                                     val_actual = Math.min(eval, val_actual);
-                                    beta = Math.min(beta, eval);
+                                    //beta = Math.min(beta, eval);
+                                    beta = Math.min(beta, val_actual);
                                     if (beta <= alpha) return val_actual;
                                     //System.out.println("Estoy en MIN");
                                 }
@@ -295,7 +299,7 @@ public class PacoIterative implements IPlayer, IAuto {
                     listAmazonas.set(i,amazonTemp);
                 }
             }
-        } 
+        }
       
         return val_actual;
     }
