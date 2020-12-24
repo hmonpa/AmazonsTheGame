@@ -252,11 +252,9 @@ public class Paco implements IPlayer, IAuto {
                             nodesExp++;
                             arrowToActual = new Point(jj, ii);
                             if (s2.getPos(arrowToActual) == EMPTY){
-                                 GameStatus s3 = new GameStatus(s2);
-                                 s3.placeArrow(arrowToActual);
-                                 //System.out.println(s3.toString());
-                                 // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
-                                //double moviment_fletxa = Double.NEGATIVE_INFINITY;
+                                GameStatus s3 = new GameStatus(s2);
+                                s3.placeArrow(arrowToActual);
+                                 
                                 double eval = Double.NEGATIVE_INFINITY;
                                 if (hihaTemps) eval = min_max(s3, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
                                 if(min_or_max){
@@ -272,10 +270,6 @@ public class Paco implements IPlayer, IAuto {
                                     //System.out.println("Estoy en MIN");
                                 }
                                 if (!hihaTemps) return Double.NEGATIVE_INFINITY;
-                                /*if(moviment_fletxa >= millor_moviment_fletxa){
-                                    millor_moviment_fletxa = moviment_fletxa;
-                                    millor_fletxa = arrowToActual;
-                                }*/
                                 //if (!hihaTemps) millor_moviment = Double.NEGATIVE_INFINITY;
                             }
                         }
@@ -363,6 +357,7 @@ public class Paco implements IPlayer, IAuto {
                 else if ("W".equals(dada)) contWhites+=4;
             }
         }
+        
         return (contBlacks+contEnemy) - (contWhites+contAllied);
         //return contEnemy - contAllied;
     }
