@@ -5,7 +5,6 @@ import static edu.upc.epsevg.prop.amazons.CellType.*;
 import edu.upc.epsevg.prop.amazons.GameStatus;
 import edu.upc.epsevg.prop.amazons.IAuto;
 import edu.upc.epsevg.prop.amazons.IPlayer;
-import edu.upc.epsevg.prop.amazons.Level;
 import edu.upc.epsevg.prop.amazons.Move;
 import edu.upc.epsevg.prop.amazons.SearchType;
 import java.awt.Point;
@@ -15,62 +14,69 @@ import java.util.Random;
 /**
  * 
  * @author Héctor Montesinos, César Médina
+ * Inteligencia artificial de michael
  */
 public class PacoIterative implements IPlayer, IAuto {
 
     private final String name;
     private double millor_moviment;
-    private int depth;
+    private int profundidad;
     int nodesExp;
     int nodesQuarterBoard;
-    boolean hihaTemps;
+    boolean hayTiempo;
     Move bestMove;
     
+    /**
+     * Contructor por defecto de PacoIterative
+     */
     public PacoIterative() {
-        this.name = "Paco iter";
-        this.hihaTemps = true;
-        this.nodesQuarterBoard = 23;
+        this.name = "Michael Iter";
+        //this.hayTiempo = true;
+        this.nodesQuarterBoard = 20;
     }
 
-    @Override
+    /**
+     * Move, funcion que avalua el mejor movimiento posible dado un tablero.
+     * @param s Tableto actual.
+     * @return bestMove, el mejor movimiento y tirada de flecha.
+     */
+    @Override    
     public Move move(GameStatus s){
-        
         millor_moviment = Double.NEGATIVE_INFINITY;
-       
+        double alpha = Double.NEGATIVE_INFINITY;
         Point arrowTo = null;
         Point amazonTo = null;
         Point amazonFrom = null;
         nodesExp = 0;
-        depth = 1;
-        hihaTemps = true;
+        profundidad = 1;                      // profundidad
+        hayTiempo = true;
         
-        while (hihaTemps && depth <= s.getEmptyCellsCount()){
+        while (hayTiempo && profundidad <= s.getEmptyCellsCount()){
             if (!s.isGameOver()){
-                
                 CellType color = s.getCurrentPlayer();                      // Devuelve jugador actual (P1 o P2)
-                //System.out.println("Move- Jugador:" + color);
                 ArrayList<Point> listAmazonas = new ArrayList<>();
                 int numAmazonas = s.getNumberOfAmazonsForEachColor();       // Número de amazonas para cada jugador (4)
-
                 for (int i=0; i<numAmazonas; i++){
                     listAmazonas.add(s.getAmazon(color, i));                // Posiciones de las amazonas
                 }
 
-                ArrayList<Point> listEnemics = new ArrayList<>();
-
+                ArrayList<Point> listEnemigos = new ArrayList<>();           
+                
+                // Bucle que busca las posiciones de las reinas enemigas
                 boolean trobades = false;                                   // Es el enemic
                 int cont = 0;                                               // Contador que busca los enemigos
                 for (int i=0; i<s.getSize() && !trobades; i++){             // Filas
                     for (int j=0; j<s.getSize() && !trobades; j++){         // Columnas
                         Point t = new Point(i,j);                           // t = posición i,j
                         if (s.getPos(t) == opposite(color)) {    
-                            listEnemics.add(t);
+                            listEnemigos.add(t);
                             cont++;
                             if (cont == 4) trobades = true;
                         }
                     }
                 }
 
+                // Bucle 
                 for (int i=0; i<listAmazonas.size(); i++){
                     ArrayList<Point> listMoviments = s.getAmazonMoves(listAmazonas.get(i), false);    // Boolean=True: Muestra sólo jugadas finales, no intermedias
                     for (int j=0; j<listMoviments.size(); j++){
@@ -88,9 +94,9 @@ public class PacoIterative implements IPlayer, IAuto {
                             boolean trobat = false;
 
                             // Bucle tiraflechas
-                            while (ii < listEnemics.size() && !trobat){
-                                int x = listEnemics.get(ii).x;       // COLUMNA
-                                int y = listEnemics.get(ii).y;       // FILA
+                            while (ii < listEnemigos.size() && !trobat){
+                                int x = listEnemigos.get(ii).x;       // COLUMNA
+                                int y = listEnemigos.get(ii).y;       // FILA
 
                                 arrowToActual = buscarMejorTiro(x, y, s2, nodesExp);
                                 if (arrowToActual == null) arrowToActual = primer_lliure(s2, nodesExp);           // Si un jugador se suicida y no tiene ningun hueco a su alrededor
@@ -101,14 +107,21 @@ public class PacoIterative implements IPlayer, IAuto {
                             s2.placeArrow(arrowToActual);
 
                             // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
-                            double moviment = min_max(s2, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, listAmazonas, false);
+                            double moviment = Double.NEGATIVE_INFINITY;
+                            if (hayTiempo) moviment = min_max(s2, profundidad-1, opposite(color), alpha, Double.POSITIVE_INFINITY, listAmazonas, false);
+                            alpha = Math.max(alpha, moviment);
                             listAmazonas.set(i,amazonTemp);
+                            if (!hayTiempo){
+                                millor_moviment = Double.NEGATIVE_INFINITY;
+                                moviment = Double.NEGATIVE_INFINITY;
+                            }
                             if(moviment > millor_moviment){
                                 amazonTo = listMoviments.get(j);
                                 amazonFrom = listAmazonas.get(i);
                                 arrowTo = arrowToActual;
                                 millor_moviment = moviment;
                             }
+                            
                         }
                         else {
                             //System.out.println("tengo menos de 23");
@@ -126,31 +139,36 @@ public class PacoIterative implements IPlayer, IAuto {
                                          //System.out.println(s3.toString());
                                          // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
                                         double moviment_fletxa = Double.NEGATIVE_INFINITY;
-                                        if (hihaTemps) moviment_fletxa = min_max(s3, depth-1, opposite(color), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, listAmazonas, false);
+                                        if (hayTiempo) moviment_fletxa = min_max(s3, profundidad-1, opposite(color), alpha, Double.POSITIVE_INFINITY, listAmazonas, false);
+                                        alpha = Math.max(alpha, moviment_fletxa);
                                         if (moviment_fletxa >= millor_moviment_fletxa){
                                             millor_moviment_fletxa = moviment_fletxa;
                                             millor_fletxa = arrowToActual;
                                         }
-                                        if (!hihaTemps) millor_moviment = Double.NEGATIVE_INFINITY;
+                                        if (!hayTiempo){
+                                            millor_moviment = Double.NEGATIVE_INFINITY;
+                                            millor_moviment_fletxa = Double.NEGATIVE_INFINITY;
+                                        }
 
                                     }
                                 }
                             }
                             listAmazonas.set(i,amazonTemp);
-                            if (millor_moviment_fletxa >= millor_moviment ){
+                            if (millor_moviment_fletxa > millor_moviment ){
                                 amazonTo = listMoviments.get(j);
                                 amazonFrom = listAmazonas.get(i);
                                 arrowTo = millor_fletxa;
                                 millor_moviment = millor_moviment_fletxa;
+                                //System.out.println("Mejor movimiento");
                             }
                         }
-                    }
+                    }// final bucle list moviments
                 }
             }
-            if (millor_moviment != Double.NEGATIVE_INFINITY) bestMove = new Move(amazonFrom, amazonTo, arrowTo, nodesExp, depth, SearchType.MINIMAX);
+            if (millor_moviment != Double.NEGATIVE_INFINITY) bestMove = new Move(amazonFrom, amazonTo, arrowTo, nodesExp, profundidad, SearchType.MINIMAX);
         
             //System.out.println("amazona de: " + amazonFrom + " , amazona a:  " + amazonTo + " , flecha a:  " + arrowTo + " , profundidad: " + depth);
-            depth++;
+            profundidad++;
         }
         //System.out.println("Acaba");
         //System.out.println("is game over" + s.isGameOver());
@@ -234,9 +252,10 @@ public class PacoIterative implements IPlayer, IAuto {
                     //System.out.println("Print: " + s2.toString());
                     //System.out.println("booleano" + min_or_max);
                     double eval = Double.NEGATIVE_INFINITY;
-                    if (hihaTemps) eval = min_max(s2, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
-                    listAmazonas.set(i,amazonTemp);
+                    
                     if(min_or_max){ //MAX
+                        if (hayTiempo) eval = min_max(s2, depth-1, opposite(color), alpha, Double.POSITIVE_INFINITY, listAmazonas, !min_or_max);
+                        //listAmazonas.set(i,amazonTemp);
                         val_actual = Math.max(eval, val_actual);
                         //alpha = Math.max(alpha, eval);
                         alpha = Math.max(alpha, val_actual);
@@ -244,13 +263,16 @@ public class PacoIterative implements IPlayer, IAuto {
                         //System.out.println("Estoy en MAX");
                     }
                     else{ //MIN
+                        //double eval = Double.NEGATIVE_INFINITY;
+                        if (hayTiempo) eval = min_max(s2, depth-1, opposite(color), Double.NEGATIVE_INFINITY, beta, listAmazonas, !min_or_max);
+                        //listAmazonas.set(i,amazonTemp);
                         val_actual = Math.min(eval, val_actual);
                         //beta = Math.min(beta, eval);
                         beta = Math.min(beta, val_actual);
                         if (beta <= alpha) return val_actual;
                         //System.out.println("Estoy en MIN");
                     }
-                    if (!hihaTemps) return Double.NEGATIVE_INFINITY;
+                    if (!hayTiempo) return Double.NEGATIVE_INFINITY;
                     //System.out.println("despues de la llamada min_max: "+listAmazonas);
                 }
                 
@@ -259,6 +281,7 @@ public class PacoIterative implements IPlayer, IAuto {
                 //double millor_moviment_fletxa = Double.NEGATIVE_INFINITY;
                 //Point millor_fletxa = null;
                     //arrowToActual = null;
+                    //bucle:
                     for(int ii=0;ii<s2.getSize();ii++){
                         for(int jj=0; jj<s2.getSize();jj++){
                             nodesExp++;
@@ -270,22 +293,31 @@ public class PacoIterative implements IPlayer, IAuto {
                                  // NEGATIVE_INFINITY = Alpha, POSITIVE_INFINITY = Beta
                                 //double moviment_fletxa = Double.NEGATIVE_INFINITY;
                                 double eval = Double.NEGATIVE_INFINITY;
-                                if (hihaTemps) eval = min_max(s3, depth-1, opposite(color), alpha, beta, listAmazonas, !min_or_max);
+                                
                                 if(min_or_max){ // MAX
+                                    if (hayTiempo) eval = min_max(s3, depth-1, opposite(color), alpha, Double.POSITIVE_INFINITY, listAmazonas, !min_or_max);
+                                    if (!hayTiempo) return Double.NEGATIVE_INFINITY;
                                     val_actual = Math.max(eval, val_actual);
-                                    //alpha = Math.max(alpha, eval);
                                     alpha = Math.max(alpha, val_actual);
                                     if(beta <= alpha) return val_actual;
+                                    
+                                    //alpha = Math.max(alpha, val_actual);
+                                    //break bucle;
+                                    //if(beta <= alpha) return val_actual;
                                     //System.out.println("Estoy en MAX");
                                 }
                                 else{ // Min
+                                    if (hayTiempo) eval = min_max(s3, depth-1, opposite(color), Double.NEGATIVE_INFINITY, beta, listAmazonas, !min_or_max);
+                                    if (!hayTiempo) return Double.NEGATIVE_INFINITY;
                                     val_actual = Math.min(eval, val_actual);
-                                    //beta = Math.min(beta, eval);
                                     beta = Math.min(beta, val_actual);
-                                    if (beta <= alpha) return val_actual;
+                                    if(beta <= alpha) return val_actual;
+
+                                    //beta = Math.min(beta, val_actual);
+                                    //if (beta <= alpha) return val_actual;
                                     //System.out.println("Estoy en MIN");
                                 }
-                                if (!hihaTemps) return Double.NEGATIVE_INFINITY;
+                                
                                 /*if(moviment_fletxa >= millor_moviment_fletxa){
                                     millor_moviment_fletxa = moviment_fletxa;
                                     millor_fletxa = arrowToActual;
@@ -296,8 +328,25 @@ public class PacoIterative implements IPlayer, IAuto {
                             }
                         }
                     }
-                    listAmazonas.set(i,amazonTemp);
+                    
+                    
+                    
+                    /*if(min_or_max){ // MAX
+                        if(beta <= alpha) return val_actual;
+                        //System.out.println("Estoy en MAX");
+                    }
+                    else{ // Min
+                        //if (beta <= alpha) return val_actual;
+                        //val_actual = Math.min(eval, val_actual);
+                        //beta = Math.min(beta, eval);
+                        //beta = Math.min(beta, val_actual);
+                        if (beta <= alpha) return val_actual;
+                        //System.out.println("Estoy en MIN");
+                    }*/
+                    
+                    
                 }
+                listAmazonas.set(i,amazonTemp);
             }
         }
       
@@ -790,7 +839,7 @@ public class PacoIterative implements IPlayer, IAuto {
     @Override
     public void timeout() {
         // Accede tras exceder el tiempo indicado como Timeout
-        hihaTemps = false;
+        hayTiempo = false;
     }
 
     @Override

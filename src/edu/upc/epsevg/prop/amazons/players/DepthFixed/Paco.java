@@ -28,7 +28,7 @@ public class Paco implements IPlayer, IAuto {
     boolean hihaTemps = true;
     
     public Paco(int depth) {
-        this.name = "Paco fijo";
+        this.name = "Michael fijo";
         this.depth = depth;
         this.nodesQuarterBoard = 23;
     }
@@ -795,4 +795,3 @@ class Casella {
         this.enemy = true;
     }
 }
-

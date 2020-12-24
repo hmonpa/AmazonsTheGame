@@ -26,11 +26,11 @@ public class Amazons {
                 IPlayer depthy = new Paco(3);
                 // IterativeDeepening
                 IPlayer player1 = new PacoIterative();
-                //IPlayer player2 = new RandomPlayer("Falso paco");
+                //IPlayer playerR = new RandomPlayer("Falso paco");
                // IPlayer player2 = new HumanPlayer("Humano paco");
                 IPlayer player2 = new CarlinhosPlayer();
                 
-                new AmazonsBoard(player2, player1, 5, Level.QUARTERBOARD);
+                new AmazonsBoard(player1, player2, 5, Level.FULL_BOARD);
                 
             }
         });
